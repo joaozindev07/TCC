@@ -2,6 +2,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import { Link, Stack } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Header } from "react-native/Libraries/NewAppScreen";
 
 function ProfileButton() {
     return(
@@ -29,10 +30,9 @@ export default function StackPage() {
             headerStyle: { backgroundColor: '#D6C3F8', },
             headerTintColor: '#A259F7',
         }}>
-            <Stack.Screen name="home" options={{ headerShown: false }} redirect={!isSignedIn}/>
             <Stack.Screen name="profile" options={{ headerTitle: "", headerRight: () => <LogoutButton/> }} redirect={!isSignedIn}/>
-            <Stack.Screen name="mood" options={{ headerTitle: "", }} redirect={!isSignedIn}/>
-            <Stack.Screen name="professional" options={{ headerTitle: "", }} redirect={!isSignedIn}/>
+            <Stack.Screen name="mood" options={{ headerShown: false }} redirect={!isSignedIn}/>
+            <Stack.Screen name="professional" options={{ headerShown: false }} redirect={!isSignedIn}/>
         </Stack>
     );
 }
