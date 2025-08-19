@@ -1,205 +1,349 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { FontAwesome, AntDesign } from '@expo/vector-icons';
-import { Link } from 'expo-router';
-import { useSignIn } from '@clerk/clerk-expo';
-import { LinearGradient } from 'expo-linear-gradient';
+"use client"
+
+import { useState } from "react"
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  StatusBar,
+} from "react-native"
+import { Ionicons } from "@expo/vector-icons"
+import { LinearGradient } from "expo-linear-gradient"
+
+const { width, height } = Dimensions.get("window")
 
 export default function LoginScreen() {
-    const { signIn, isLoaded, setActive } = useSignIn();
-    const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("")
+  const [senha, setSenha] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-    async function handleLogin() {
-        if (!isLoaded) return;
-
-        try {
-            const signinUser = await signIn.create({
-                identifier: email,
-                password: senha,
-            })
-
-            await setActive({ session: signinUser.createdSessionId });
-
-        } catch (e) {
-            console.error('Erro ao fazer login:', e);
-        }
+  async function handleLogin() {
+    setIsLoading(true)
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      console.log("Login attempt:", { email, senha })
+    } catch (e) {
+      console.error("Erro ao fazer login:", e)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    return (
-        <View style={styles.container}>
-            {/* Topo roxo */}
-            <LinearGradient
-              colors={['#A259F7', '#c85efdff']}
-              start={{ x: 0, y: 1}}
-              end={{ x: 0, y: 0}}
-              style={styles.topSection}
-            >
-                <Image source={require('../../assets/images/icon.png')} style={styles.logo} />
-                <Text style={styles.title}>HEALTHMIND</Text>
-            </LinearGradient>
-            {/* Inputs e botões em fundo branco */}
-            <View style={styles.inputSection}>
-                <View style={styles.inputContainer}>
-                    
-                    <View style={styles.inputWrapper}>
-                        <FontAwesome name="envelope" size={20} color="#888" style={styles.inputIcon} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email"
-                            placeholderTextColor="#666"
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    </View>
-                    <View style={styles.inputWrapper}>
-                        <FontAwesome name="lock" size={20} color="#888" style={styles.inputIcon} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Senha"
-                            placeholderTextColor="#666"
-                            value={senha}
-                            onChangeText={setSenha}
-                            secureTextEntry
-                        />
-                    </View>
-                    <Text style={{marginTop: -20, marginBottom: 20, color: '#666', marginRight: -160, fontSize: 14}}>Esqueceu a senha?</Text>
-                    <TouchableOpacity style={styles.login} onPress={handleLogin} activeOpacity={0.8}>
-                        <LinearGradient
-                            colors={['#A259F7', '#be41fdff']}
-                            style={styles.loginGradient}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                        >
-                            <Text style={styles.loginText}>Entrar</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <View style={styles.socialContainer}>
-                        <TouchableOpacity style={styles.socialButton}>
-                            <AntDesign name="google" size={34} color="#EA4335" />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.socialButton}>
-                            <FontAwesome name="facebook" size={34} color="#1877F3" />
-                        </TouchableOpacity>
-                    </View>
-                    <Link href="/register" asChild>
-                        <TouchableOpacity>
-                            <Text style={styles.registerButtonText}>Não tem uma conta? Cadastre-se</Text>
-                        </TouchableOpacity>
-                    </Link>
-                </View>
-            </View>
+  return (
+    <LinearGradient
+      colors={["#A259F7", "#c85efd", "#be41fd"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
+
+      {/* Header Section */}
+      <View style={styles.headerContainer}>
+        <View style={styles.logoContainer}>
+          <View style={styles.logoOuter}>
+            <View style={styles.logoInner} />
+          </View>
         </View>
-    );
+        <Text style={styles.appTitle}>HEALTHMIND</Text>
+        <Text style={styles.subtitle}>Entre na sua conta</Text>
+      </View>
+
+      {/* Login Form */}
+      <LinearGradient
+        colors={["rgba(255, 255, 255, 0.98)", "rgba(255, 255, 255, 0.92)"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.formContainer}
+      >
+        {/* Email Input */}
+        <View style={styles.inputContainer}>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Email"
+              placeholderTextColor="#9CA3AF"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+        </View>
+
+        {/* Password Input */}
+        <View style={styles.inputContainer}>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.textInput, { paddingRight: 50 }]}
+              placeholder="Senha"
+              placeholderTextColor="#9CA3AF"
+              value={senha}
+              onChangeText={setSenha}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <TouchableOpacity style={styles.eyeButton} onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Forgot Password */}
+        <TouchableOpacity style={styles.forgotPasswordContainer}>
+          <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+        </TouchableOpacity>
+
+        {/* Login Button */}
+        <TouchableOpacity
+          style={[styles.loginButtonWrapper, isLoading && styles.loginButtonDisabled]}
+          onPress={handleLogin}
+          disabled={isLoading}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={["#A259F7", "#c85efd", "#be41fd"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.loginButton}
+          >
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#FFFFFF" />
+                <Text style={styles.loginButtonText}>Entrando...</Text>
+              </View>
+            ) : (
+              <Text style={styles.loginButtonText}>Entrar</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ou continue com</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {/* Social Buttons */}
+        <View style={styles.socialButtonsContainer}>
+          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+            <Text style={styles.socialButtonText}>G</Text>
+            <Text style={styles.socialButtonLabel}>Google</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+            <Text style={styles.socialButtonText}>f</Text>
+            <Text style={styles.socialButtonLabel}>Facebook</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sign Up Link */}
+        <View style={styles.signUpContainer}>
+          <Text style={styles.signUpText}>Não tem uma conta? </Text>
+          <TouchableOpacity>
+            <Text style={styles.signUpLink}>Cadastre-se</Text>
+          </TouchableOpacity>
+        </View>
+
+      </LinearGradient>
+    </LinearGradient>
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#A259F7',
-    },
-    topSection: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 60,
-        paddingBottom: 42,
-    },
-    logo: {
-        width: 100,
-        height: 100,
-        marginBottom: 16,
-        resizeMode: 'contain',
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#f8f8f8',
-        marginBottom: 0,
-        letterSpacing: 2,
-    },
-    inputSection: {
-        flex: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 0,
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 42,      
-        borderTopRightRadius: 42,     
-        marginTop: 10,               
-        zIndex: 2,                   
-    },
-    inputContainer: {
-        width: '100%',
-        paddingHorizontal: 26,
-        borderRadius: 26,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        marginTop: -70,
-    },
-    inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 24,
-        marginBottom: 30,
-        elevation: 3,
-        paddingHorizontal: 12,
-    },
-    inputIcon: {
-        marginRight: 6,
-    },
-    input: {
-        flex: 1,
-        padding: 14,
-        fontSize: 16,
-        color: '#333',
-        backgroundColor: 'transparent',
-    },
-    login: {
-        borderRadius: 24,
-        marginBottom: 5,
-        width: '100%',
-        alignItems: 'center',
-        overflow: 'hidden',
-        elevation: 8,
-    },
-    loginGradient: {
-        width: '100%',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    loginText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    socialContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginVertical: 20,
-        marginTop: 40,
-        paddingBottom: 50,
-        gap: 36,
-    },
-    socialButton: {
-       flexDirection: 'row',
-    },
-    linkContainer: {
-        flexDirection: 'row',
-        gap: 16,
-        paddingHorizontal: 14,
-        marginTop: 40,
-    },
-    registerButtonText: {
-        color: '#696868ff',
-        fontSize: 14,
-        textDecorationLine: 'underline',
-        letterSpacing: 0.5,
-    },
-});
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    flex: 0.4,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 60,
+  },
+  logoContainer: {
+    marginBottom: 24,
+  },
+  logoOuter: {
+    width: 96,
+    height: 96,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  logoInner: {
+    width: 64,
+    height: 64,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  appTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.8)",
+  },
+  formContainer: {
+    flex: 0.6,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingHorizontal: 32,
+    paddingTop: 40,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 16,
+    height: 56,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+    color: "#374151",
+    paddingVertical: 0,
+  },
+  eyeButton: {
+    padding: 8,
+    position: "absolute",
+    right: 8,
+  },
+  forgotPasswordContainer: {
+    alignItems: "flex-end",
+    marginBottom: 32,
+  },
+  forgotPasswordText: {
+    color: "#A259F7",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  loginButtonWrapper: {
+    borderRadius: 16,
+    marginBottom: 32,
+    shadowColor: "#A259F7",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  loginButton: {
+    borderRadius: 16,
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButtonDisabled: {
+    opacity: 0.7,
+  },
+  loginButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E5E7EB",
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: "#6B7280",
+    fontSize: 14,
+  },
+  socialButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 32,
+  },
+  socialButton: {
+    flex: 0.48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  socialButtonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginRight: 8,
+    color: "#374151",
+  },
+  socialButtonLabel: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#374151",
+  },
+  signUpContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 24,
+  },
+  signUpText: {
+    color: "#6B7280",
+    fontSize: 16,
+  },
+  signUpLink: {
+    color: "#A259F7",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+})

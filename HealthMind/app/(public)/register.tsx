@@ -185,7 +185,7 @@ export default function RegisterScreen() {
                 <Picker.Item label="Prefiro não dizer" value="Prefiro não dizer" />
               </Picker>
             </View>
-            <Link href="/onboarding" asChild>
+           
               <TouchableOpacity
                 style={[styles.registerButton,
                   //!camposValidos || loading ? { opacity: 0.6 } : null
@@ -207,7 +207,6 @@ export default function RegisterScreen() {
                   )}
                 </LinearGradient>
               </TouchableOpacity>
-            </Link>
             <View style={styles.linkContainer}>
               <Link href="/login" asChild>
                 <TouchableOpacity>
