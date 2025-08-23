@@ -6,20 +6,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 
-// function isValidEmail(email: string) {
-//   return /\S+@\S+\.\S+/.test(email);
-// }
-
-// function isValidDate(dia: string, mes: string, ano: string) {
-//   if (dia.length !== 2 || mes.length !== 2 || ano.length !== 4) return false;
-//   const date = new Date(`${ano}-${mes}-${dia}`);
-//   return (
-//     date.getFullYear() === Number(ano) &&
-//     date.getMonth() + 1 === Number(mes) &&
-//     date.getDate() === Number(dia)
-//   );
-// }
-
 export default function RegisterScreen() {
   const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
@@ -36,54 +22,61 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
 
-  // const camposValidos =
-  //   nome.trim().length > 2 &&
-  //   isValidEmail(email) &&
-  //   senha.length >= 6 &&
-  //   isValidDate(dia, mes, ano) &&
-  //   genero.length > 0;
+  // Validação simples (pode melhorar depois)
+  const camposValidos =
+    nome.trim().length > 2 &&
+    /\S+@\S+\.\S+/.test(email) &&
+    senha.length >= 6 &&
+    dia.length === 2 &&
+    mes.length === 2 &&
+    ano.length === 4 &&
+    genero.length > 0;
 
-  // async function handleregister() {
-  //   if (!isLoaded || loading || !camposValidos) return;
-  //   setErro('');
-  //   setLoading(true);
+  async function handleregister() {
+    if (!isLoaded || loading || !camposValidos) return;
+    setErro('');
+    setLoading(true);
 
-  //   try {
-  //     await signUp.create({
-  //       firstName: nome,
-  //       emailAddress: email,
-  //       password: senha,
-  //     });
+    try {
+      await signUp.create({
+        firstName: nome,
+        emailAddress: email,
+        password: senha,
+        unsafeMetadata: {
+          birthdate: `${ano}-${mes}-${dia}`,
+          gender: genero,
+        },
+      });
 
-  //     await signUp.prepareEmailAddressVerification({
-  //       strategy: 'email_code',
-  //     });
-  //     setEmailPending(true);
-  //   } catch (e: any) {
-  //     setErro(e.errors?.[0]?.message || 'Erro ao registrar. Tente novamente.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
+      await signUp.prepareEmailAddressVerification({
+        strategy: 'email_code',
+      });
+      setEmailPending(true);
+    } catch (e: any) {
+      setErro(e.errors?.[0]?.message || 'Erro ao registrar. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  // async function handleVerifyAccount() {
-  //   if (!isLoaded || loading) return;
-  //   setErro('');
-  //   setLoading(true);
+  async function handleVerifyAccount() {
+    if (!isLoaded || loading) return;
+    setErro('');
+    setLoading(true);
 
-  //   try {
-  //     const verification = await signUp?.attemptEmailAddressVerification({
-  //       code,
-  //     });
+    try {
+      const verification = await signUp?.attemptEmailAddressVerification({
+        code,
+      });
 
-  //     await setActive({ session: verification.createdSessionId });
-  //     router.replace('/onboarding');
-  //   } catch (e: any) {
-  //     setErro(e.errors?.[0]?.message || 'Código inválido. Tente novamente.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
+      await setActive({ session: verification.createdSessionId });
+      router.replace('/(auth)/mood');
+    } catch (e: any) {
+      setErro(e.errors?.[0]?.message || 'Código inválido. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -185,28 +178,27 @@ export default function RegisterScreen() {
                 <Picker.Item label="Prefiro não dizer" value="Prefiro não dizer" />
               </Picker>
             </View>
-           
-              <TouchableOpacity
-                style={[styles.registerButton,
-                  //!camposValidos || loading ? { opacity: 0.6 } : null
-                ]}
-              // onPress={handleregister}
-              // disabled={!camposValidos || loading}
+            <TouchableOpacity
+              style={[
+                styles.registerButton,
+                !camposValidos || loading ? { opacity: 0.6 } : null,
+              ]}
+              onPress={handleregister}
+              disabled={!camposValidos || loading}
+            >
+              <LinearGradient
+                colors={['#A259F7', '#be41fdff']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.registerGradient}
               >
-                <LinearGradient
-                  colors={['#A259F7', '#be41fdff']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.registerGradient}
-                >
-
-                  {loading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={{ color: '#fff', textAlign: 'center', fontWeight: '900', fontSize: 16 }}>Criar Conta</Text>
-                  )}
-                </LinearGradient>
-              </TouchableOpacity>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={{ color: '#fff', textAlign: 'center', fontWeight: '900', fontSize: 16 }}>Criar Conta</Text>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
             <View style={styles.linkContainer}>
               <Link href="/login" asChild>
                 <TouchableOpacity>
@@ -231,7 +223,7 @@ export default function RegisterScreen() {
             />
             <TouchableOpacity
               style={[styles.registerButton, loading ? { opacity: 0.6 } : null]}
-              //onPress={handleVerifyAccount}
+              onPress={handleVerifyAccount}
               disabled={loading || code.length < 4}
             >
               <LinearGradient

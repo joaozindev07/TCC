@@ -30,7 +30,7 @@ export default function StackPage() {
             headerStyle: { backgroundColor: '#D6C3F8', },
             headerTintColor: '#A259F7',
         }}>
-            <Stack.Screen name="profile" options={{ headerTitle: "", headerRight: () => <LogoutButton/> }} redirect={!isSignedIn}/>
+            <Stack.Screen name="profile" options={{ headerShown: false }} redirect={!isSignedIn}/>
             <Stack.Screen name="mood" options={{ headerShown: false }} redirect={!isSignedIn}/>
             <Stack.Screen name="professional" options={{ headerShown: false }} redirect={!isSignedIn}/>
         </Stack>

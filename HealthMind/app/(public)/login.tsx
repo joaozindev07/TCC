@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TextInput,
+  Image,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
@@ -13,6 +14,8 @@ import {
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
+import { Link, useRouter } from "expo-router"
+import { useSignIn } from "@clerk/clerk-expo"
 
 const { width, height } = Dimensions.get("window")
 
@@ -21,14 +24,23 @@ export default function LoginScreen() {
   const [senha, setSenha] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [erro, setErro] = useState("")
+  const { signIn, setActive, isLoaded } = useSignIn()
+  const router = useRouter()
 
   async function handleLogin() {
+    if (!isLoaded) return
     setIsLoading(true)
+    setErro("")
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Login attempt:", { email, senha })
-    } catch (e) {
-      console.error("Erro ao fazer login:", e)
+      const result = await signIn.create({
+        identifier: email,
+        password: senha,
+      })
+      await setActive({ session: result.createdSessionId })
+      router.replace("/(auth)/mood") // ou a rota desejada após login
+    } catch (e: any) {
+      setErro(e.errors?.[0]?.message || "Email ou senha inválidos.")
     } finally {
       setIsLoading(false)
     }
@@ -42,25 +54,22 @@ export default function LoginScreen() {
       style={styles.container}
     >
       <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
-
       {/* Header Section */}
       <View style={styles.headerContainer}>
         <View style={styles.logoContainer}>
-          <View style={styles.logoOuter}>
-            <View style={styles.logoInner} />
-          </View>
+          <Image source={require('../../assets/images/icon.png')} style={styles.logo}></Image>
         </View>
         <Text style={styles.appTitle}>HEALTHMIND</Text>
         <Text style={styles.subtitle}>Entre na sua conta</Text>
       </View>
-
-      {/* Login Form */}
       <LinearGradient
         colors={["rgba(255, 255, 255, 0.98)", "rgba(255, 255, 255, 0.92)"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.formContainer}
       >
+        {erro ? <Text style={{ color: "#ff3333", textAlign: "center", marginBottom: 12 }}>{erro}</Text> : null}
+
         {/* Email Input */}
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
@@ -149,9 +158,11 @@ export default function LoginScreen() {
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Não tem uma conta? </Text>
+          <Link href="/(public)/register">
           <TouchableOpacity>
             <Text style={styles.signUpLink}>Cadastre-se</Text>
           </TouchableOpacity>
+          </Link>
         </View>
 
       </LinearGradient>
@@ -172,26 +183,10 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginBottom: 24,
   },
-  logoOuter: {
-    width: 96,
-    height: 96,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  logoInner: {
-    width: 64,
-    height: 64,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   appTitle: {
     fontSize: 32,
