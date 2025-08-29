@@ -1,11 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, StatusBar, FlatList } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { LinearGradient } from "expo-linear-gradient"
+import { useState, useMemo } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  StatusBar,
+  FlatList,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
 const professionalTypes = [
   { id: 1, name: "Todos", icon: "people-outline" },
@@ -14,7 +23,7 @@ const professionalTypes = [
   { id: 4, name: "Terapeuta", icon: "heart-outline" },
   { id: 5, name: "Psicanalista", icon: "library-outline" },
   { id: 6, name: "Neuropsicólogo", icon: "brain-outline" },
-]
+];
 
 const mockProfessionals = [
   {
@@ -44,18 +53,42 @@ const mockProfessionals = [
     price: "R$ 100",
     available: true,
   },
-]
+];
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter((n) => n.length > 0)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 export default function ProfessionalSearchScreen() {
-  const [searchText, setSearchText] = useState("")
-  const [selectedFilter, setSelectedFilter] = useState(1)
-  const [showFilters, setShowFilters] = useState(false)
+  const [searchText, setSearchText] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Filtro e busca combinados
+  const filteredProfessionals = useMemo(() => {
+    return mockProfessionals.filter((prof) => {
+      const matchesType =
+        selectedFilter === 1 ||
+        prof.specialty ===
+          professionalTypes.find((t) => t.id === selectedFilter)?.name;
+      const matchesSearch =
+        prof.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        prof.specialty.toLowerCase().includes(searchText.toLowerCase());
+      return matchesType && matchesSearch;
+    });
+  }, [searchText, selectedFilter]);
 
   const renderProfessionalCard = ({ item }) => (
     <View style={styles.professionalCard}>
       <View style={styles.professionalHeader}>
         <View style={styles.professionalAvatar}>
-          <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
+          <Text style={styles.avatarText}>{getInitials(item.name)}</Text>
         </View>
         <View style={styles.professionalInfo}>
           <Text style={styles.professionalName}>{item.name}</Text>
@@ -68,15 +101,35 @@ export default function ProfessionalSearchScreen() {
         </View>
         <View style={styles.professionalActions}>
           <Text style={styles.priceText}>{item.price}</Text>
-          <View style={[styles.statusBadge, item.available ? styles.availableBadge : styles.unavailableBadge]}>
-            <Text style={[styles.statusText, item.available ? styles.availableText : styles.unavailableText]}>
+          <View
+            style={[
+              styles.statusBadge,
+              item.available ? styles.availableBadge : styles.unavailableBadge,
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                item.available ? styles.availableText : styles.unavailableText,
+              ]}
+            >
               {item.available ? "Disponível" : "Ocupado"}
             </Text>
           </View>
         </View>
       </View>
 
-      <TouchableOpacity style={styles.contactButtonWrapper} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[
+          styles.contactButtonWrapper,
+          !item.available && { opacity: 0.5 },
+        ]}
+        activeOpacity={item.available ? 0.8 : 1}
+        disabled={!item.available}
+        accessibilityLabel={
+          item.available ? "Agendar Consulta" : "Profissional Ocupado"
+        }
+      >
         <LinearGradient
           colors={["#A259F7", "#c85efd", "#be41fd"]}
           start={{ x: 0, y: 0 }}
@@ -84,17 +137,23 @@ export default function ProfessionalSearchScreen() {
           style={styles.contactButton}
         >
           <Ionicons name="chatbubble-outline" size={18} color="#FFFFFF" />
-          <Text style={styles.contactButtonText}>Agendar Consulta</Text>
+          <Text style={styles.contactButtonText}>
+            {item.available ? "Agendar Consulta" : "Indisponível"}
+          </Text>
         </LinearGradient>
       </TouchableOpacity>
     </View>
-  )
+  );
 
   const renderFilterChip = ({ item }) => (
     <TouchableOpacity
-      style={[styles.filterChip, selectedFilter === item.id && styles.activeFilterChip]}
+      style={[
+        styles.filterChip,
+        selectedFilter === item.id && styles.activeFilterChip,
+      ]}
       onPress={() => setSelectedFilter(item.id)}
       activeOpacity={0.7}
+      accessibilityLabel={`Filtrar por ${item.name}`}
     >
       <Ionicons
         name={item.icon}
@@ -102,9 +161,16 @@ export default function ProfessionalSearchScreen() {
         color={selectedFilter === item.id ? "#FFFFFF" : "#A259F7"}
         style={styles.filterIcon}
       />
-      <Text style={[styles.filterText, selectedFilter === item.id && styles.activeFilterText]}>{item.name}</Text>
+      <Text
+        style={[
+          styles.filterText,
+          selectedFilter === item.id && styles.activeFilterText,
+        ]}
+      >
+        {item.name}
+      </Text>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <LinearGradient
@@ -118,15 +184,20 @@ export default function ProfessionalSearchScreen() {
       {/* Header Section */}
       <View style={styles.headerContainer}>
         <View style={styles.headerTop}>
-          <TouchableOpacity style={styles.backButton}>
+          <TouchableOpacity
+            style={styles.backButton}
+            accessibilityLabel="Voltar"
+          >
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuButton}>
+          <TouchableOpacity style={styles.menuButton} accessibilityLabel="Menu">
             <Ionicons name="menu-outline" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
         <Text style={styles.appTitle}>Encontrar Profissionais</Text>
-        <Text style={styles.subtitle}>Conecte-se com especialistas qualificados</Text>
+        <Text style={styles.subtitle}>
+          Conecte-se com especialistas qualificados
+        </Text>
       </View>
 
       {/* Search and Content */}
@@ -139,7 +210,12 @@ export default function ProfessionalSearchScreen() {
         {/* Search Bar */}
         <View style={styles.searchContainer}>
           <View style={styles.searchWrapper}>
-            <Ionicons name="search-outline" size={20} color="#9CA3AF" style={styles.searchIcon} />
+            <Ionicons
+              name="search-outline"
+              size={20}
+              color="#9CA3AF"
+              style={styles.searchIcon}
+            />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar por nome ou especialidade..."
@@ -148,8 +224,14 @@ export default function ProfessionalSearchScreen() {
               onChangeText={setSearchText}
               autoCapitalize="none"
               autoCorrect={false}
+              accessibilityLabel="Buscar profissional"
+              returnKeyType="search"
             />
-            <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
+            <TouchableOpacity
+              style={styles.filterToggle}
+              onPress={() => setShowFilters(!showFilters)}
+              accessibilityLabel="Mostrar filtros"
+            >
               <Ionicons name="options-outline" size={20} color="#A259F7" />
             </TouchableOpacity>
           </View>
@@ -172,22 +254,31 @@ export default function ProfessionalSearchScreen() {
         {/* Results Header */}
         <View style={styles.resultsHeader}>
           <Text style={styles.resultsTitle}>Profissionais Disponíveis</Text>
-          <Text style={styles.resultsCount}>{mockProfessionals.length} encontrados</Text>
+          <Text style={styles.resultsCount}>
+            {filteredProfessionals.length} encontrados
+          </Text>
         </View>
 
         {/* Professionals List */}
         <FlatList
-          data={mockProfessionals}
+          data={filteredProfessionals}
           renderItem={renderProfessionalCard}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.professionalsList}
+          ListEmptyComponent={
+            <Text
+              style={{ textAlign: "center", color: "#A259F7", marginTop: 32 }}
+            >
+              Nenhum profissional encontrado.
+            </Text>
+          }
         />
 
         <View style={styles.androidBottomSpacing} />
       </LinearGradient>
     </LinearGradient>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -235,6 +326,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "rgba(255, 255, 255, 0.8)",
     textAlign: "center",
+    marginBottom: 20,
   },
   contentContainer: {
     flex: 0.75,
@@ -449,4 +541,4 @@ const styles = StyleSheet.create({
   androidBottomSpacing: {
     height: 24,
   },
-})
+});
