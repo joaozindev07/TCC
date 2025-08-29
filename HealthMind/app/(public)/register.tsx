@@ -437,6 +437,7 @@ const styles = StyleSheet.create({
     height: 56,
     color: "#374151",
     backgroundColor: "transparent",
+    borderRadius: 16,
     borderWidth: 0,
   },
   registerButtonWrapper: {

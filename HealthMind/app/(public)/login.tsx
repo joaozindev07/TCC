@@ -12,20 +12,11 @@ import {
   Dimensions,
   ActivityIndicator,
   StatusBar,
-<<<<<<< HEAD
-  ScrollView
-} from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { LinearGradient } from "expo-linear-gradient"
-import { Link, useRouter } from "expo-router"
-import { useSignIn } from "@clerk/clerk-expo"
-=======
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
 import { useSignIn } from "@clerk/clerk-expo";
->>>>>>> 51d881d49755c1f659c02e4b4fb8c6ba8972a3f7
 
 const { width, height } = Dimensions.get("window");
 
@@ -48,7 +39,7 @@ export default function LoginScreen() {
         password: senha,
       });
       await setActive({ session: result.createdSessionId });
-      router.replace("/(auth)/mood"); // ou a rota desejada após login
+      router.replace("/(auth)/home"); // ou a rota desejada após login
     } catch (e: any) {
       setErro(e.errors?.[0]?.message || "Email ou senha inválidos.");
     } finally {
@@ -63,7 +54,6 @@ export default function LoginScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <ScrollView>
       <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
       {/* Header Section */}
       <View style={styles.headerContainer}>
@@ -194,68 +184,6 @@ export default function LoginScreen() {
               <Text style={styles.socialButtonLabel}>Facebook</Text>
             </TouchableOpacity>
           </View>
-<<<<<<< HEAD
-        </View>
-
-        {/* Forgot Password */}
-        <TouchableOpacity style={styles.forgotPasswordContainer}>
-          <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
-        </TouchableOpacity>
-
-        {/* Login Button */}
-        <TouchableOpacity
-          style={[styles.loginButtonWrapper, isLoading && styles.loginButtonDisabled]}
-          onPress={handleLogin}
-          disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={["#A259F7", "#c85efd", "#be41fd"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.loginButton}
-          >
-            {isLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={styles.loginButtonText}>Entrando...</Text>
-              </View>
-            ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
-
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>ou continue com</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* Social Buttons */}
-        <View style={styles.socialButtonsContainer}>
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Text style={styles.socialButtonText}>G</Text>
-            <Text style={styles.socialButtonLabel}>Google</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Text style={styles.socialButtonText}>f</Text>
-            <Text style={styles.socialButtonLabel}>Facebook</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Sign Up Link */}
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Não tem uma conta? </Text>
-          <TouchableOpacity>
-          <Link href="/(public)/register">
-            <Text style={styles.signUpLink}>Cadastre-se</Text>
-          </Link>
-          </TouchableOpacity>
-        </View>
-=======
->>>>>>> 51d881d49755c1f659c02e4b4fb8c6ba8972a3f7
 
           {/* Sign Up Link */}
           <View style={styles.signUpContainer}>
@@ -268,7 +196,6 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </LinearGradient>
-            </ScrollView>
     </LinearGradient>
   );
 }
@@ -434,11 +361,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 24,
-<<<<<<< HEAD
-    paddingBottom: 50,
-=======
     marginBottom: 20,
->>>>>>> 51d881d49755c1f659c02e4b4fb8c6ba8972a3f7
   },
   signUpText: {
     color: "#6B7280",

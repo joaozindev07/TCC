@@ -16,12 +16,14 @@ import {
 } from "react-native"
 import { useRouter } from "expo-router"
 import { Link } from "expo-router"
+import { useAuth } from "@clerk/clerk-expo"
 
 const { width, height } = Dimensions.get("window")
 const STATUSBAR_HEIGHT = Platform.OS === "android" ? StatusBar.currentHeight ?? 24 : 0
 
 export default function ProfilePage() {
   const router = useRouter()
+  const { signOut } = useAuth()
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [darkModeEnabled, setDarkModeEnabled] = useState(false)
   const [name, setName] = useState("Maria Silva")
@@ -31,9 +33,8 @@ export default function ProfilePage() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
-      {/* Header */}
       <View style={[styles.header, { paddingTop: STATUSBAR_HEIGHT + height * 0.02 }]}>
-        <Link href={"/mood"} asChild>
+        <Link href={"/home"} asChild>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
@@ -152,7 +153,13 @@ export default function ProfilePage() {
             <Text style={styles.saveButtonText}>Salvar Alterações</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={async () => {
+              await signOut()
+              router.replace("/login")
+            }}
+          >
             <Text style={styles.logoutButtonText}>Sair da Conta</Text>
           </TouchableOpacity>
         </View>
