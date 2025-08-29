@@ -3,6 +3,7 @@
 import { useState } from "react"
 import {
   View,
+  ScrollView,
   Text,
   TextInput,
   Image,
@@ -67,8 +68,9 @@ export default function LoginScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.formContainer}
-      >
+        >
         {erro ? <Text style={{ color: "#ff3333", textAlign: "center", marginBottom: 12 }}>{erro}</Text> : null}
+          <ScrollView>
 
         {/* Email Input */}
         <View style={styles.inputContainer}>
@@ -158,13 +160,14 @@ export default function LoginScreen() {
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Não tem uma conta? </Text>
-          <Link href="/(public)/register">
           <TouchableOpacity>
+          <Link href="/register">
             <Text style={styles.signUpLink}>Cadastre-se</Text>
-          </TouchableOpacity>
           </Link>
+          </TouchableOpacity>
         </View>
 
+      </ScrollView>
       </LinearGradient>
     </LinearGradient>
   )
@@ -331,6 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 24,
+    marginBottom: 20,
   },
   signUpText: {
     color: "#6B7280",
