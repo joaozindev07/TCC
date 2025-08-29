@@ -325,7 +325,7 @@ export default function RegisterScreen() {
               </TouchableOpacity>
             </View>
           )}
-        </ScrollView>
+          </ScrollView>
       </LinearGradient>
     </LinearGradient>
   );
@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: "rgba(255, 255, 255, 0.8)",
+    marginBottom: 20,
   },
   formContainer: {
     flex: 0.6,

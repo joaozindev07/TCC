@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   View,
   ScrollView,
@@ -12,38 +12,38 @@ import {
   Dimensions,
   ActivityIndicator,
   StatusBar,
-} from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { LinearGradient } from "expo-linear-gradient"
-import { Link, useRouter } from "expo-router"
-import { useSignIn } from "@clerk/clerk-expo"
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useRouter } from "expo-router";
+import { useSignIn } from "@clerk/clerk-expo";
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("")
-  const [senha, setSenha] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [erro, setErro] = useState("")
-  const { signIn, setActive, isLoaded } = useSignIn()
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [erro, setErro] = useState("");
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const router = useRouter();
 
   async function handleLogin() {
-    if (!isLoaded) return
-    setIsLoading(true)
-    setErro("")
+    if (!isLoaded) return;
+    setIsLoading(true);
+    setErro("");
     try {
       const result = await signIn.create({
         identifier: email,
         password: senha,
-      })
-      await setActive({ session: result.createdSessionId })
-      router.replace("/(auth)/mood") // ou a rota desejada após login
+      });
+      await setActive({ session: result.createdSessionId });
+      router.replace("/(auth)/mood"); // ou a rota desejada após login
     } catch (e: any) {
-      setErro(e.errors?.[0]?.message || "Email ou senha inválidos.")
+      setErro(e.errors?.[0]?.message || "Email ou senha inválidos.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -58,7 +58,10 @@ export default function LoginScreen() {
       {/* Header Section */}
       <View style={styles.headerContainer}>
         <View style={styles.logoContainer}>
-          <Image source={require('../../assets/images/icon.png')} style={styles.logo}></Image>
+          <Image
+            source={require("../../assets/images/icon.png")}
+            style={styles.logo}
+          ></Image>
         </View>
         <Text style={styles.appTitle}>HEALTHMIND</Text>
         <Text style={styles.subtitle}>Entre na sua conta</Text>
@@ -68,109 +71,133 @@ export default function LoginScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.formContainer}
-        >
-        {erro ? <Text style={{ color: "#ff3333", textAlign: "center", marginBottom: 12 }}>{erro}</Text> : null}
-          <ScrollView>
-
-        {/* Email Input */}
-        <View style={styles.inputContainer}>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Email"
-              placeholderTextColor="#9CA3AF"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+      >
+        {erro ? (
+          <Text
+            style={{ color: "#ff3333", textAlign: "center", marginBottom: 12 }}
+          >
+            {erro}
+          </Text>
+        ) : null}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Email Input */}
+          <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color="#9CA3AF"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Email"
+                placeholderTextColor="#9CA3AF"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
           </View>
-        </View>
 
-        {/* Password Input */}
-        <View style={styles.inputContainer}>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-            <TextInput
-              style={[styles.textInput, { paddingRight: 50 }]}
-              placeholder="Senha"
-              placeholderTextColor="#9CA3AF"
-              value={senha}
-              onChangeText={setSenha}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <TouchableOpacity style={styles.eyeButton} onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#9CA3AF" />
+          {/* Password Input */}
+          <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#9CA3AF"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={[styles.textInput, { paddingRight: 50 }]}
+                placeholder="Senha"
+                placeholderTextColor="#9CA3AF"
+                value={senha}
+                onChangeText={setSenha}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color="#9CA3AF"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Forgot Password */}
+          <TouchableOpacity style={styles.forgotPasswordContainer}>
+            <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+          </TouchableOpacity>
+
+          {/* Login Button */}
+          <TouchableOpacity
+            style={[
+              styles.loginButtonWrapper,
+              isLoading && styles.loginButtonDisabled,
+            ]}
+            onPress={handleLogin}
+            disabled={isLoading}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#A259F7", "#c85efd", "#be41fd"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.loginButton}
+            >
+              {isLoading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <Text style={styles.loginButtonText}>Entrando...</Text>
+                </View>
+              ) : (
+                <Text style={styles.loginButtonText}>Entrar</Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>ou continue com</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Social Buttons */}
+          <View style={styles.socialButtonsContainer}>
+            <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+              <Text style={styles.socialButtonText}>G</Text>
+              <Text style={styles.socialButtonLabel}>Google</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+              <Text style={styles.socialButtonText}>f</Text>
+              <Text style={styles.socialButtonLabel}>Facebook</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Forgot Password */}
-        <TouchableOpacity style={styles.forgotPasswordContainer}>
-          <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
-        </TouchableOpacity>
-
-        {/* Login Button */}
-        <TouchableOpacity
-          style={[styles.loginButtonWrapper, isLoading && styles.loginButtonDisabled]}
-          onPress={handleLogin}
-          disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={["#A259F7", "#c85efd", "#be41fd"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.loginButton}
-          >
-            {isLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={styles.loginButtonText}>Entrando...</Text>
-              </View>
-            ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
-
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>ou continue com</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* Social Buttons */}
-        <View style={styles.socialButtonsContainer}>
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Text style={styles.socialButtonText}>G</Text>
-            <Text style={styles.socialButtonLabel}>Google</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Text style={styles.socialButtonText}>f</Text>
-            <Text style={styles.socialButtonLabel}>Facebook</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Sign Up Link */}
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Não tem uma conta? </Text>
-          <TouchableOpacity>
-          <Link href="/register">
-            <Text style={styles.signUpLink}>Cadastre-se</Text>
-          </Link>
-          </TouchableOpacity>
-        </View>
-
-      </ScrollView>
+          {/* Sign Up Link */}
+          <View style={styles.signUpContainer}>
+            <Text style={styles.signUpText}>Não tem uma conta? </Text>
+            <TouchableOpacity>
+              <Link href="/register">
+                <Text style={styles.signUpLink}>Cadastre-se</Text>
+              </Link>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </LinearGradient>
     </LinearGradient>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -189,7 +216,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 100,
     height: 100,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   appTitle: {
     fontSize: 32,
@@ -345,4 +372,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
