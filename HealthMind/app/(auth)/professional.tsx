@@ -1,165 +1,452 @@
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from "react-native";
+"use client"
 
-const professionals = [
-    {
-        id: 1,
-        name: "Dra. Ana Souza",
-        specialty: "Psicóloga Clínica",
-        image: require('../../assets/images/icon.png'),
-        rating: 4.9,
-        price: "R$ 120/h",
-    },
-    {
-        id: 2,
-        name: "Dr. João Silva",
-        specialty: "Psicólogo Infantil",
-        image: require('../../assets/images/icon.png'),
-        rating: 4.8,
-        price: "R$ 100/h",
-    },
-    {
-        id: 3,
-        name: "Dra. Maria Oliveira",
-        specialty: "Psicóloga Organizacional",
-        image: require('../../assets/images/icon.png'),
-        rating: 5.0,
-        price: "R$ 150/h",
-    },
-];
+import { useState } from "react"
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, StatusBar, FlatList } from "react-native"
+import { Ionicons } from "@expo/vector-icons"
+import { LinearGradient } from "expo-linear-gradient"
 
-export default function ProfessionalScreen() {
-    return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.list}>
-            <Text style={styles.title}>Encontre um Psicólogo</Text>
-            <Text style={styles.subtitle}>Contrate sessões online com profissionais qualificados</Text>
-                {professionals.map((pro) => (
-                    <View key={pro.id} style={styles.card}>
-                        <Image source={pro.image} style={styles.avatar} />
-                        <View style={styles.info}>
-                            <Text style={styles.name}>{pro.name}</Text>
-                            <Text style={styles.specialty}>{pro.specialty}</Text>
-                            <View style={styles.row}>
-                                <FontAwesome name="star" size={16} color="#FFD700" />
-                                <Text style={styles.rating}>{pro.rating}</Text>
-                                <Text style={styles.price}>{pro.price}</Text>
-                            </View>
-                            <TouchableOpacity style={styles.button}>
-                                <Text style={styles.buttonText}>Agendar Sessão</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                ))}
-            </ScrollView>
-            <View style={styles.footer}>
-                <Link href="/mood" asChild>
-                    <MaterialIcons name="psychology" size={28} color="#A259F7" />
-                </Link>
-                <Link href="/professional" asChild>
-                    <MaterialIcons name="boy" size={36} color="#A259F7" />
-                </Link>
-                <Link href={"/profile"} asChild>
-                    <MaterialIcons name="face" size={28} color="#A259F7" style={{ marginRight: 10 }} />
-                </Link>
-            </View>
-        </SafeAreaView>
-    );
+const { width, height } = Dimensions.get("window")
+
+const professionalTypes = [
+  { id: 1, name: "Todos", icon: "people-outline" },
+  { id: 2, name: "Psicólogo Clínico", icon: "medical-outline" },
+  { id: 3, name: "Psiquiatra", icon: "fitness-outline" },
+  { id: 4, name: "Terapeuta", icon: "heart-outline" },
+  { id: 5, name: "Psicanalista", icon: "library-outline" },
+  { id: 6, name: "Neuropsicólogo", icon: "brain-outline" },
+]
+
+const mockProfessionals = [
+  {
+    id: 1,
+    name: "Dr. Ana Silva",
+    specialty: "Psicólogo Clínico",
+    rating: 4.8,
+    experience: "8 anos",
+    price: "R$ 120",
+    available: true,
+  },
+  {
+    id: 2,
+    name: "Dr. Carlos Santos",
+    specialty: "Psiquiatra",
+    rating: 4.9,
+    experience: "12 anos",
+    price: "R$ 200",
+    available: false,
+  },
+  {
+    id: 3,
+    name: "Dra. Maria Costa",
+    specialty: "Terapeuta",
+    rating: 4.7,
+    experience: "6 anos",
+    price: "R$ 100",
+    available: true,
+  },
+]
+
+export default function ProfessionalSearchScreen() {
+  const [searchText, setSearchText] = useState("")
+  const [selectedFilter, setSelectedFilter] = useState(1)
+  const [showFilters, setShowFilters] = useState(false)
+
+  const renderProfessionalCard = ({ item }) => (
+    <View style={styles.professionalCard}>
+      <View style={styles.professionalHeader}>
+        <View style={styles.professionalAvatar}>
+          <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
+        </View>
+        <View style={styles.professionalInfo}>
+          <Text style={styles.professionalName}>{item.name}</Text>
+          <Text style={styles.professionalSpecialty}>{item.specialty}</Text>
+          <View style={styles.ratingContainer}>
+            <Ionicons name="star" size={16} color="#FFC107" />
+            <Text style={styles.ratingText}>{item.rating}</Text>
+            <Text style={styles.experienceText}>• {item.experience}</Text>
+          </View>
+        </View>
+        <View style={styles.professionalActions}>
+          <Text style={styles.priceText}>{item.price}</Text>
+          <View style={[styles.statusBadge, item.available ? styles.availableBadge : styles.unavailableBadge]}>
+            <Text style={[styles.statusText, item.available ? styles.availableText : styles.unavailableText]}>
+              {item.available ? "Disponível" : "Ocupado"}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.contactButtonWrapper} activeOpacity={0.8}>
+        <LinearGradient
+          colors={["#A259F7", "#c85efd", "#be41fd"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.contactButton}
+        >
+          <Ionicons name="chatbubble-outline" size={18} color="#FFFFFF" />
+          <Text style={styles.contactButtonText}>Agendar Consulta</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  )
+
+  const renderFilterChip = ({ item }) => (
+    <TouchableOpacity
+      style={[styles.filterChip, selectedFilter === item.id && styles.activeFilterChip]}
+      onPress={() => setSelectedFilter(item.id)}
+      activeOpacity={0.7}
+    >
+      <Ionicons
+        name={item.icon}
+        size={16}
+        color={selectedFilter === item.id ? "#FFFFFF" : "#A259F7"}
+        style={styles.filterIcon}
+      />
+      <Text style={[styles.filterText, selectedFilter === item.id && styles.activeFilterText]}>{item.name}</Text>
+    </TouchableOpacity>
+  )
+
+  return (
+    <LinearGradient
+      colors={["#A259F7", "#c85efd", "#be41fd"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
+
+      {/* Header Section */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuButton}>
+            <Ionicons name="menu-outline" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.appTitle}>Encontrar Profissionais</Text>
+        <Text style={styles.subtitle}>Conecte-se com especialistas qualificados</Text>
+      </View>
+
+      {/* Search and Content */}
+      <LinearGradient
+        colors={["rgba(255, 255, 255, 0.98)", "rgba(255, 255, 255, 0.92)"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.contentContainer}
+      >
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchWrapper}>
+            <Ionicons name="search-outline" size={20} color="#9CA3AF" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar por nome ou especialidade..."
+              placeholderTextColor="#9CA3AF"
+              value={searchText}
+              onChangeText={setSearchText}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
+              <Ionicons name="options-outline" size={20} color="#A259F7" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Filter Chips */}
+        {showFilters && (
+          <View style={styles.filtersContainer}>
+            <FlatList
+              data={professionalTypes}
+              renderItem={renderFilterChip}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filtersList}
+            />
+          </View>
+        )}
+
+        {/* Results Header */}
+        <View style={styles.resultsHeader}>
+          <Text style={styles.resultsTitle}>Profissionais Disponíveis</Text>
+          <Text style={styles.resultsCount}>{mockProfessionals.length} encontrados</Text>
+        </View>
+
+        {/* Professionals List */}
+        <FlatList
+          data={mockProfessionals}
+          renderItem={renderProfessionalCard}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.professionalsList}
+        />
+
+        <View style={styles.androidBottomSpacing} />
+      </LinearGradient>
+    </LinearGradient>
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#D6C3F8',
-        padding: 16,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#A259F7',
-        marginTop: 10,
-        marginBottom: 4,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
-    list: {
-        paddingBottom: 80,
-    },
-    card: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 16,
-        alignItems: 'center',
-        elevation: 3,
-    },
-    avatar: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        marginRight: 16,
-        backgroundColor: '#eee',
-    },
-    info: {
-        flex: 1,
-    },
-    name: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    specialty: {
-        fontSize: 14,
-        color: '#A259F7',
-        marginBottom: 4,
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    rating: {
-        fontSize: 14,
-        color: '#333',
-        marginLeft: 4,
-        marginRight: 12,
-    },
-    price: {
-        fontSize: 14,
-        color: '#666',
-    },
-    button: {
-        backgroundColor: '#A259F7',
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderRadius: 24,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-    footer: {
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: 100,
-        backgroundColor: "#fff",
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        elevation: 8,
-        paddingBottom: 30,
-    },
-});
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    flex: 0.25,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 60,
+    paddingHorizontal: 32,
+  },
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 24,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  appTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.8)",
+    textAlign: "center",
+  },
+  contentContainer: {
+    flex: 0.75,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  searchContainer: {
+    marginBottom: 20,
+  },
+  searchWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 16,
+    height: 56,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  searchIcon: {
+    marginRight: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: "#374151",
+    paddingVertical: 0,
+  },
+  filterToggle: {
+    padding: 8,
+  },
+  filtersContainer: {
+    marginBottom: 24,
+  },
+  filtersList: {
+    paddingHorizontal: 4,
+  },
+  filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: "#A259F7",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  activeFilterChip: {
+    backgroundColor: "#A259F7",
+    borderColor: "#A259F7",
+  },
+  filterIcon: {
+    marginRight: 6,
+  },
+  filterText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#A259F7",
+  },
+  activeFilterText: {
+    color: "#FFFFFF",
+  },
+  resultsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  resultsTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#374151",
+  },
+  resultsCount: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  professionalsList: {
+    paddingBottom: 20,
+  },
+  professionalCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
+  },
+  professionalHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
+  professionalAvatar: {
+    width: 56,
+    height: 56,
+    backgroundColor: "#A259F7",
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  avatarText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+  },
+  professionalInfo: {
+    flex: 1,
+  },
+  professionalName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 4,
+  },
+  professionalSpecialty: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginBottom: 8,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  ratingText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#374151",
+    marginLeft: 4,
+  },
+  experienceText: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginLeft: 4,
+  },
+  professionalActions: {
+    alignItems: "flex-end",
+  },
+  priceText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#A259F7",
+    marginBottom: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  availableBadge: {
+    backgroundColor: "#D1FAE5",
+  },
+  unavailableBadge: {
+    backgroundColor: "#FEE2E2",
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  availableText: {
+    color: "#065F46",
+  },
+  unavailableText: {
+    color: "#991B1B",
+  },
+  contactButtonWrapper: {
+    borderRadius: 12,
+    shadowColor: "#A259F7",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  contactButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 12,
+    height: 44,
+    paddingHorizontal: 16,
+  },
+  contactButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+  androidBottomSpacing: {
+    height: 24,
+  },
+})
