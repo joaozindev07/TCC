@@ -31,7 +31,7 @@ export default function StackPage() {
             headerTintColor: '#A259F7',
         }}>
             <Stack.Screen name="profile" options={{ headerShown: false }} redirect={!isSignedIn}/>
-            <Stack.Screen name="mood" options={{ headerShown: false }} redirect={!isSignedIn}/>
+            <Stack.Screen name="home" options={{ headerShown: false }} redirect={!isSignedIn}/>
             <Stack.Screen name="professional" options={{ headerShown: false }} redirect={!isSignedIn}/>
         </Stack>
     );
