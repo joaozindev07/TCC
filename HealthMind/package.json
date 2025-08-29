@@ -21,10 +21,7 @@
     "expo-font": "~13.3.1",
     "expo-linear-gradient": "^14.1.5",
     "expo-linking": "~7.1.5",
-<<<<<<< HEAD
-    "expo-modules-core": "^2.5.0",
-=======
->>>>>>> 385bb05bf3f82ce77ea254106d7ebf49b866ab9d
+    "expo-modules-core": "~2.5.0",
     "expo-router": "~5.1.5",
     "expo-secure-store": "~14.2.4",
     "expo-splash-screen": "~0.30.9",
@@ -32,8 +29,8 @@
     "expo-system-ui": "~5.0.11",
     "expo-web-browser": "~14.2.0",
     "lucide-react": "^0.540.0",
-    "react": "^19.0.0",
-    "react-native": "^0.79.5",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",

@@ -11,6 +11,7 @@ import {
   Dimensions,
   ActivityIndicator,
   StatusBar,
+  ScrollView
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
@@ -53,6 +54,7 @@ export default function LoginScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
+      <ScrollView>
       <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
       {/* Header Section */}
       <View style={styles.headerContainer}>
@@ -158,14 +160,15 @@ export default function LoginScreen() {
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Não tem uma conta? </Text>
-          <Link href="/(public)/register">
           <TouchableOpacity>
+          <Link href="/(public)/register">
             <Text style={styles.signUpLink}>Cadastre-se</Text>
-          </TouchableOpacity>
           </Link>
+          </TouchableOpacity>
         </View>
 
       </LinearGradient>
+            </ScrollView>
     </LinearGradient>
   )
 }
@@ -331,6 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 24,
+    paddingBottom: 50,
   },
   signUpText: {
     color: "#6B7280",

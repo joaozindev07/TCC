@@ -11,9 +11,14 @@ import {
   SafeAreaView,
   StatusBar,
   Switch,
+  Platform,
+  Dimensions,
 } from "react-native"
 import { useRouter } from "expo-router"
 import { Link } from "expo-router"
+
+const { width, height } = Dimensions.get("window")
+const STATUSBAR_HEIGHT = Platform.OS === "android" ? StatusBar.currentHeight ?? 24 : 0
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -27,11 +32,11 @@ export default function ProfilePage() {
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: STATUSBAR_HEIGHT + height * 0.02 }]}>
         <Link href={"/mood"} asChild>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
         </Link>
         <Text style={styles.headerTitle}>Perfil</Text>
         <View style={styles.headerSpacer} />
@@ -170,36 +175,39 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
+    paddingHorizontal: width * 0.06,
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#F1F5F9",
+    // paddingTop será sobrescrito no componente
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: width * 0.11,
+    height: width * 0.11,
+    borderRadius: width * 0.055,
     backgroundColor: "#F1F5F9",
     alignItems: "center",
     justifyContent: "center",
   },
   backIcon: {
-    fontSize: 20,
+    fontSize: width * 0.075,
     color: "#1F2937",
+    marginTop: -17,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: width * 0.06,
     fontWeight: "700",
     color: "#1F2937",
   },
   headerSpacer: {
-    width: 40,
+    width: width * 0.11,
   },
 
   // Sections
   section: {
     paddingHorizontal: 24,
-    marginBottom: 32,
+    marginBottom: 12,
+    marginTop: 22,
   },
   sectionTitle: {
     fontSize: 20,

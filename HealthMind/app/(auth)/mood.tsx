@@ -11,10 +11,12 @@ import {
   SafeAreaView,
   StatusBar,
   Dimensions,
+  Platform,
 } from "react-native"
 import { useRouter } from "expo-router"
 
-const { width } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window")
+const STATUSBAR_HEIGHT = Platform.OS === "android" ? StatusBar.currentHeight ?? 24 : 0
 
 export default function HomePage() {
   const router = useRouter()
@@ -46,9 +48,9 @@ export default function HomePage() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: height * 0.05 }}>
         {/* Hero Section */}
-        <View style={styles.heroSection}>
+        <View style={[styles.heroSection, { paddingTop: STATUSBAR_HEIGHT + height * 0.04 }]}>
           <View style={styles.headerContainer}>
             <View style={styles.heroContent}>
               <Text style={styles.heroTitle}>Bem-vindo ao seu{"\n"}espaço de bem-estar</Text>
@@ -57,10 +59,10 @@ export default function HomePage() {
               </Text>
 
               {/* Search Bar */}
-              <View style={styles.searchContainer}>
+              <View style={[styles.searchContainer]}>
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="Buscar recursos, profissionais..."
+                  placeholder="Buscar recursos..."
                   placeholderTextColor="#6B7280"
                   value={searchQuery}
                   onChangeText={setSearchQuery}
@@ -70,7 +72,6 @@ export default function HomePage() {
                 </TouchableOpacity>
               </View>
             </View>
-
             <TouchableOpacity style={styles.profileButton} onPress={() => router.push("/profile")}>
               <View style={styles.profileIcon}>
                 <Text style={styles.profileIconText}>👤</Text>
@@ -89,28 +90,38 @@ export default function HomePage() {
         {/* Daily Mood Tracker */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Como você está se sentindo hoje?</Text>
-          <View style={styles.moodContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 0, paddingHorizontal: 0 }}
+            style={{ marginBottom: height * 0.03 }}
+          >
             {moods.map((mood, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
                   styles.moodButton,
                   selectedMood === mood.label && { ...styles.moodButtonSelected, borderColor: mood.color },
+                  { width: 100, padding: width * 0.03, marginRight: width * 0.03 },
                 ]}
                 onPress={() => setSelectedMood(mood.label)}
               >
-                <Text style={styles.moodEmoji}>{mood.emoji}</Text>
-                <Text style={[styles.moodLabel, selectedMood === mood.label && { color: mood.color }]}>
+                <Text style={[styles.moodEmoji, { fontSize: width * 0.07 }]}>{mood.emoji}</Text>
+                <Text style={[
+                  styles.moodLabel,
+                  selectedMood === mood.label && { color: mood.color },
+                  { fontSize: width * 0.035 }
+                ]}>
                   {mood.label}
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
 
           {selectedMood && (
             <View style={styles.noteContainer}>
               <TextInput
-                style={styles.noteInput}
+                style={[styles.noteInput, { fontSize: width * 0.045, minHeight: height * 0.13 }]}
                 placeholder={`Conte mais sobre como você está se sentindo ${selectedMood.toLowerCase()}...`}
                 placeholderTextColor="#9CA3AF"
                 multiline
@@ -120,7 +131,7 @@ export default function HomePage() {
                 textAlignVertical="top"
               />
               <TouchableOpacity style={styles.saveNoteButton}>
-                <Text style={styles.saveNoteText}>Salvar reflexão</Text>
+                <Text style={[styles.saveNoteText, { fontSize: width * 0.045 }]}>Salvar reflexão</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -133,21 +144,27 @@ export default function HomePage() {
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.professionalsScroll}>
             {professionals.map((prof, index) => (
-              <View key={index} style={styles.professionalCard}>
+              <View key={index} style={[styles.professionalCard, { width: width * 0.5, padding: width * 0.05 }]}>
                 <View style={styles.professionalHeader}>
-                  <View style={styles.professionalAvatar}>
-                    <Text style={styles.professionalInitial}>{prof.name.charAt(0)}</Text>
+                  <View style={[styles.professionalAvatar, { width: width * 0.13, height: width * 0.13, borderRadius: width * 0.065 }]}>
+                    <Text style={[styles.professionalInitial, { fontSize: width * 0.06 }]}>{prof.name.charAt(0)}</Text>
                   </View>
-                  <View style={[styles.statusIndicator, { backgroundColor: prof.available ? "#10B981" : "#6B7280" }]} />
+                  <View style={[
+                    styles.statusIndicator,
+                    { width: width * 0.03, height: width * 0.03, borderRadius: width * 0.015 },
+                    { backgroundColor: prof.available ? "#10B981" : "#6B7280" }
+                  ]} />
                 </View>
-                <Text style={styles.professionalName}>{prof.name}</Text>
-                <Text style={styles.professionalSpecialty}>{prof.specialty}</Text>
+                <Text style={[styles.professionalName, { fontSize: width * 0.045 }]}>{prof.name}</Text>
+                <Text style={[styles.professionalSpecialty, { fontSize: width * 0.035 }]}>{prof.specialty}</Text>
                 <View style={styles.ratingContainer}>
-                  <Text style={styles.ratingText}>⭐ {prof.rating}</Text>
-                  <Text style={styles.availabilityText}>{prof.available ? "Disponível agora" : "Ocupado"}</Text>
+                  <Text style={[styles.ratingText, { fontSize: width * 0.035 }]}>⭐ {prof.rating}</Text>
+                  <Text style={[styles.availabilityText, { fontSize: width * 0.03, color: prof.available ? "#10B981" : "#6B7280" }]}>
+                    {prof.available ? "Disponível agora" : "Ocupado"}
+                  </Text>
                 </View>
                 <TouchableOpacity style={[styles.connectButton, !prof.available && styles.connectButtonDisabled]}>
-                  <Text style={[styles.connectButtonText, !prof.available && styles.connectButtonTextDisabled]}>
+                  <Text style={[styles.connectButtonText, !prof.available && styles.connectButtonTextDisabled, { fontSize: width * 0.04 }]}>
                     {prof.available ? "Conectar" : "Agendar"}
                   </Text>
                 </TouchableOpacity>
@@ -163,15 +180,18 @@ export default function HomePage() {
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.resourcesScroll}>
             {resources.map((resource, index) => (
-              <TouchableOpacity key={index} style={styles.resourceCard}>
+              <TouchableOpacity key={index} style={[styles.resourceCard, { width: width * 0.42, padding: width * 0.045 }]}>
                 <View style={styles.resourceHeader}>
-                  <View style={[styles.resourceIcon, { backgroundColor: getResourceColor(resource.category) }]}>
-                    <Text style={styles.resourceIconText}>{getResourceIcon(resource.category)}</Text>
+                  <View style={[
+                    styles.resourceIcon,
+                    { backgroundColor: getResourceColor(resource.category), width: width * 0.11, height: width * 0.11, borderRadius: width * 0.055 }
+                  ]}>
+                    <Text style={[styles.resourceIconText, { fontSize: width * 0.05 }]}>{getResourceIcon(resource.category)}</Text>
                   </View>
-                  <Text style={styles.resourceDuration}>{resource.duration}</Text>
+                  <Text style={[styles.resourceDuration, { fontSize: width * 0.03 }]}>{resource.duration}</Text>
                 </View>
-                <Text style={styles.resourceTitle}>{resource.title}</Text>
-                <Text style={styles.resourceType}>{resource.type}</Text>
+                <Text style={[styles.resourceTitle, { fontSize: width * 0.04 }]}>{resource.title}</Text>
+                <Text style={[styles.resourceType, { fontSize: width * 0.035 }]}>{resource.type}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -181,36 +201,34 @@ export default function HomePage() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Histórias da comunidade</Text>
           <View style={styles.testimonialsContainer}>
-            <View style={styles.testimonialCard}>
-              <Text style={styles.testimonialText}>
-                "Encontrei o apoio que precisava. Os profissionais são incríveis e me ajudaram muito."
-              </Text>
-              <Text style={styles.testimonialAuthor}>- Maria, 28 anos</Text>
+            <View style={[styles.testimonialCard, { padding: width * 0.045 }]}>
+              <Text style={[styles.testimonialText, { fontSize: width * 0.04 }]}>"Encontrei o apoio que precisava. Os profissionais são incríveis e me ajudaram muito."</Text>
+              <Text style={[styles.testimonialAuthor, { fontSize: width * 0.035 }]}>- Maria, 28 anos</Text>
             </View>
-            <View style={styles.testimonialCard}>
-              <Text style={styles.testimonialText}>
+            <View style={[styles.testimonialCard, { padding: width * 0.045 }]}>
+              <Text style={[styles.testimonialText, { fontSize: width * 0.04 }]}>
                 "Os recursos de meditação mudaram minha rotina. Agora consigo lidar melhor com a ansiedade."
               </Text>
-              <Text style={styles.testimonialAuthor}>- João, 35 anos</Text>
+              <Text style={[styles.testimonialAuthor, { fontSize: width * 0.035 }]}>- João, 35 anos</Text>
             </View>
           </View>
         </View>
 
         {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Precisa de ajuda imediata?</Text>
-          <TouchableOpacity style={styles.emergencyButton}>
-            <Text style={styles.emergencyButtonText}>Suporte 24h</Text>
+        <View style={[styles.footer, { paddingHorizontal: width * 0.06, paddingVertical: height * 0.05 }]}>
+          <Text style={[styles.footerText, { fontSize: width * 0.04 }]}>Precisa de ajuda imediata?</Text>
+          <TouchableOpacity style={[styles.emergencyButton, { paddingVertical: height * 0.018, paddingHorizontal: width * 0.13 }]}>
+            <Text style={[styles.emergencyButtonText, { fontSize: width * 0.04 }]}>Suporte 24h</Text>
           </TouchableOpacity>
           <View style={styles.footerLinks}>
             <TouchableOpacity>
-              <Text style={styles.footerLink}>Privacidade</Text>
+              <Text style={[styles.footerLink, { fontSize: width * 0.035 }]}>Privacidade</Text>
             </TouchableOpacity>
             <TouchableOpacity>
-              <Text style={styles.footerLink}>Termos</Text>
+              <Text style={[styles.footerLink, { fontSize: width * 0.035 }]}>Termos</Text>
             </TouchableOpacity>
             <TouchableOpacity>
-              <Text style={styles.footerLink}>Contato</Text>
+              <Text style={[styles.footerLink, { fontSize: width * 0.035 }]}>Contato</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -250,9 +268,9 @@ const styles = StyleSheet.create({
 
   // Hero Section
   heroSection: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingHorizontal: width * 0.06,
+    // paddingTop será sobrescrito no componente
+    paddingBottom: height * 0.05,
     position: "relative",
   },
   headerContainer: {
@@ -263,15 +281,15 @@ const styles = StyleSheet.create({
   },
   heroContent: {
     flex: 1,
-    paddingRight: 16,
+    // paddingRight será sobrescrito no componente
   },
   profileButton: {
-    marginTop: 8,
+    marginTop: height * 0.01,
   },
   profileIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: width * 0.12,
+    height: width * 0.12,
+    borderRadius: width * 0.06,
     backgroundColor: "#F1F5F9",
     alignItems: "center",
     justifyContent: "center",
@@ -279,54 +297,58 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
   },
   profileIconText: {
-    fontSize: 20,
+    fontSize: width * 0.055,
     color: "#6B7280",
   },
   heroTitle: {
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: "700",
     color: "#1F2937",
-    lineHeight: 40,
-    marginBottom: 12,
+    lineHeight: width * 0.1,
+    marginBottom: height * 0.015,
   },
   heroSubtitle: {
-    fontSize: 16,
+    fontSize: width * 0.045,
     color: "#6B7280",
-    lineHeight: 24,
-    marginBottom: 32,
+    lineHeight: width * 0.06,
+    marginBottom: height * 0.04,
+    marginRight: -55,
   },
   searchContainer: {
     flexDirection: "row",
+    marginRight: -45,
     backgroundColor: "#F1F5F9",
     borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingHorizontal: width * 0.04,
+    paddingVertical: height * 0.005,
     alignItems: "center",
+    borderWidth: 1,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: width * 0.045,
     color: "#1F2937",
-    paddingVertical: 12,
+    paddingVertical: height * 0.015,
+    width: "100%",
   },
   searchButton: {
-    padding: 8,
+    padding: width * 0.02,
   },
   searchIcon: {
-    fontSize: 18,
+    fontSize: width * 0.045,
   },
   heroIllustration: {
     position: "absolute",
-    right: -20,
-    top: 40,
-    width: 120,
-    height: 120,
+    right: -width * 0.05,
+    top: height * 0.05,
+    width: width * 0.32,
+    height: width * 0.32,
   },
   illustrationCircle1: {
     position: "absolute",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: width * 0.16,
+    height: width * 0.16,
+    borderRadius: width * 0.08,
     backgroundColor: "#A259F7",
     opacity: 0.1,
     top: 0,
@@ -334,56 +356,55 @@ const styles = StyleSheet.create({
   },
   illustrationCircle2: {
     position: "absolute",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: width * 0.11,
+    height: width * 0.11,
+    borderRadius: width * 0.055,
     backgroundColor: "#A259F7",
     opacity: 0.2,
-    top: 30,
-    right: 40,
+    top: width * 0.08,
+    right: width * 0.11,
   },
   illustrationCircle3: {
     position: "absolute",
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: width * 0.21,
+    height: width * 0.21,
+    borderRadius: width * 0.105,
     backgroundColor: "#A259F7",
     opacity: 0.05,
-    top: 20,
-    right: 20,
+    top: width * 0.05,
+    right: width * 0.05,
   },
 
   // Sections
   section: {
-    paddingHorizontal: 24,
-    marginBottom: 40,
+    paddingHorizontal: width * 0.06,
+    marginBottom: height * 0.05,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: "700",
     color: "#1F2937",
-    marginBottom: 8,
+    marginBottom: height * 0.01,
   },
   sectionSubtitle: {
-    fontSize: 16,
+    fontSize: width * 0.045,
     color: "#6B7280",
-    marginBottom: 24,
+    marginBottom: height * 0.03,
   },
 
   // Mood Tracker
   moodContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginBottom: height * 0.03,
+    // gap não é suportado em RN, usamos marginHorizontal nos filhos
   },
   moodButton: {
     alignItems: "center",
-    padding: 16,
     borderRadius: 16,
     backgroundColor: "#F1F5F9",
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "transparent",
-    minWidth: 60,
   },
   moodButtonSelected: {
     backgroundColor: "#ffffff",
@@ -395,49 +416,42 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   moodEmoji: {
-    fontSize: 24,
-    marginBottom: 8,
+    marginBottom: height * 0.01,
   },
   moodLabel: {
-    fontSize: 12,
     color: "#6B7280",
     fontWeight: "500",
   },
   noteContainer: {
     backgroundColor: "#F1F5F9",
     borderRadius: 16,
-    padding: 20,
+    padding: width * 0.05,
   },
   noteInput: {
-    fontSize: 16,
     color: "#1F2937",
-    minHeight: 100,
     textAlignVertical: "top",
-    marginBottom: 16,
+    marginBottom: height * 0.02,
   },
   saveNoteButton: {
     backgroundColor: "#A259F7",
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: height * 0.018,
     alignItems: "center",
   },
   saveNoteText: {
     color: "#ffffff",
-    fontSize: 16,
     fontWeight: "600",
   },
 
   // Professionals
   professionalsScroll: {
-    marginHorizontal: -24,
-    paddingHorizontal: 24,
+    marginHorizontal: -width * 0.06,
+    paddingHorizontal: width * 0.06,
   },
   professionalCard: {
     backgroundColor: "#ffffff",
     borderRadius: 20,
-    padding: 20,
-    marginRight: 16,
-    width: 200,
+    marginRight: width * 0.04,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -449,26 +463,19 @@ const styles = StyleSheet.create({
   professionalHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: height * 0.02,
     position: "relative",
   },
   professionalAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#A259F7",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#A259F7",
   },
   professionalInitial: {
     color: "#ffffff",
-    fontSize: 20,
     fontWeight: "700",
   },
   statusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
     position: "absolute",
     right: 0,
     top: 0,
@@ -476,44 +483,38 @@ const styles = StyleSheet.create({
     borderColor: "#ffffff",
   },
   professionalName: {
-    fontSize: 18,
     fontWeight: "700",
     color: "#1F2937",
-    marginBottom: 4,
+    marginBottom: height * 0.005,
   },
   professionalSpecialty: {
-    fontSize: 14,
     color: "#6B7280",
-    marginBottom: 12,
+    marginBottom: height * 0.015,
   },
   ratingContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: height * 0.02,
   },
   ratingText: {
-    fontSize: 14,
     color: "#1F2937",
     fontWeight: "600",
   },
   availabilityText: {
-    fontSize: 12,
-    color: "#10B981",
     fontWeight: "500",
   },
   connectButton: {
     backgroundColor: "#A259F7",
     borderRadius: 12,
-    paddingVertical: 12,
     alignItems: "center",
+    paddingVertical: height * 0.018,
   },
   connectButtonDisabled: {
     backgroundColor: "#F1F5F9",
   },
   connectButtonText: {
     color: "#ffffff",
-    fontSize: 16,
     fontWeight: "600",
   },
   connectButtonTextDisabled: {
@@ -522,15 +523,13 @@ const styles = StyleSheet.create({
 
   // Resources
   resourcesScroll: {
-    marginHorizontal: -24,
-    paddingHorizontal: 24,
+    marginHorizontal: -width * 0.06,
+    paddingHorizontal: width * 0.06,
   },
   resourceCard: {
     backgroundColor: "#ffffff",
     borderRadius: 16,
-    padding: 20,
-    marginRight: 16,
-    width: 180,
+    marginRight: width * 0.04,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -543,87 +542,70 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: height * 0.02,
   },
   resourceIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
-  resourceIconText: {
-    fontSize: 18,
-  },
+  resourceIconText: {},
   resourceDuration: {
-    fontSize: 12,
     color: "#6B7280",
     fontWeight: "500",
   },
   resourceTitle: {
-    fontSize: 16,
     fontWeight: "600",
     color: "#1F2937",
-    marginBottom: 4,
+    marginBottom: height * 0.005,
   },
   resourceType: {
-    fontSize: 14,
     color: "#6B7280",
   },
 
   // Testimonials
   testimonialsContainer: {
-    gap: 16,
+    gap: height * 0.02,
   },
   testimonialCard: {
     backgroundColor: "#F1F5F9",
     borderRadius: 16,
-    padding: 20,
   },
   testimonialText: {
-    fontSize: 16,
     color: "#1F2937",
-    lineHeight: 24,
-    marginBottom: 12,
+    lineHeight: width * 0.055,
+    marginBottom: height * 0.015,
     fontStyle: "italic",
   },
   testimonialAuthor: {
-    fontSize: 14,
     color: "#6B7280",
     fontWeight: "500",
   },
 
   // Footer
   footer: {
-    paddingHorizontal: 24,
-    paddingVertical: 40,
     alignItems: "center",
     backgroundColor: "#F1F5F9",
   },
   footerText: {
-    fontSize: 16,
     color: "#1F2937",
-    marginBottom: 16,
+    marginBottom: height * 0.02,
     fontWeight: "500",
   },
   emergencyButton: {
     backgroundColor: "#EF4444",
     borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    marginBottom: 24,
+    marginBottom: height * 0.03,
+    alignItems: "center",
   },
   emergencyButtonText: {
     color: "#ffffff",
-    fontSize: 16,
     fontWeight: "600",
   },
   footerLinks: {
     flexDirection: "row",
-    gap: 24,
+    gap: width * 0.06,
   },
   footerLink: {
-    fontSize: 14,
     color: "#6B7280",
     textDecorationLine: "underline",
   },
