@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -13,10 +13,13 @@ import {
   Switch,
   Platform,
   Dimensions,
+  Alert,
+  ActivityIndicator,
 } from "react-native"
 import { useRouter } from "expo-router"
 import { Link } from "expo-router"
 import { useAuth } from "@clerk/clerk-expo"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const { width, height } = Dimensions.get("window")
 const STATUSBAR_HEIGHT = Platform.OS === "android" ? StatusBar.currentHeight ?? 24 : 0
@@ -28,6 +31,43 @@ export default function ProfilePage() {
   const [darkModeEnabled, setDarkModeEnabled] = useState(false)
   const [name, setName] = useState("Maria Silva")
   const [email, setEmail] = useState("maria@email.com")
+  const [loading, setLoading] = useState(false)
+
+  // Carregar dados salvos ao abrir a tela
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const savedName = await AsyncStorage.getItem("profile_name")
+        const savedEmail = await AsyncStorage.getItem("profile_email")
+        const savedNotifications = await AsyncStorage.getItem("profile_notifications")
+        const savedDarkMode = await AsyncStorage.getItem("profile_darkmode")
+        if (savedName) setName(savedName)
+        if (savedEmail) setEmail(savedEmail)
+        if (savedNotifications) setNotificationsEnabled(savedNotifications === "true")
+        if (savedDarkMode) setDarkModeEnabled(savedDarkMode === "true")
+      } catch (e) {
+        // erro ao carregar
+      }
+    }
+    loadProfile()
+  }, [])
+
+  const handleSave = async () => {
+    setLoading(true)
+    try {
+      await AsyncStorage.setItem("profile_name", name)
+      await AsyncStorage.setItem("profile_email", email)
+      await AsyncStorage.setItem("profile_notifications", notificationsEnabled.toString())
+      await AsyncStorage.setItem("profile_darkmode", darkModeEnabled.toString())
+      setTimeout(() => {
+        setLoading(false)
+        Alert.alert("Sucesso", "Informações salvas localmente!")
+      }, 800)
+    } catch (e) {
+      setLoading(false)
+      Alert.alert("Erro", "Não foi possível salvar as informações.")
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,8 +189,12 @@ export default function ProfilePage() {
 
         {/* Actions */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity

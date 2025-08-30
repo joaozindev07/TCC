@@ -183,17 +183,6 @@ export default function ProfessionalSearchScreen() {
 
       {/* Header Section */}
       <View style={styles.headerContainer}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity
-            style={styles.backButton}
-            accessibilityLabel="Voltar"
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuButton} accessibilityLabel="Menu">
-            <Ionicons name="menu-outline" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
         <Text style={styles.appTitle}>Encontrar Profissionais</Text>
         <Text style={styles.subtitle}>
           Conecte-se com especialistas qualificados
@@ -291,29 +280,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 60,
     paddingHorizontal: 32,
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 24,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  menuButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
   },
   appTitle: {
     fontSize: 28,

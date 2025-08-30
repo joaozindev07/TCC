@@ -203,15 +203,6 @@ export default function IntensiveMoodScreen() {
 
       {/* Header Section */}
       <View style={styles.headerContainer}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuButton}>
-            <Ionicons name="settings-outline" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-
         <Text style={styles.appTitle}>Intensivo Dias Felizes</Text>
         <Text style={styles.subtitle}>7 dias para transformar seu humor</Text>
 
@@ -333,29 +324,6 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 24,
     zIndex: 2,
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 24,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  menuButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
   },
   appTitle: {
     fontSize: 28,
