@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Animated, View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar, FlatList } from "react-native"
+import { Animated, View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar, Image, ScrollView } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
 
@@ -104,7 +104,7 @@ export default function IntensiveMoodScreen() {
   // Exemplo: cada item ocupa 120px + padding, ajuste conforme seu design
   const estimatedItemHeight = 120
   const baseHeight = 220 // altura do header + tabs + padding
- const initialTop = height * 0.45; // ajuste esse valor para ficar logo abaixo da barra de progresso
+  const initialTop = height * 0.45; // ajuste esse valor para ficar logo abaixo da barra de progresso
 
 
   const completedChallenges = dailyChallenges.filter((challenge) => challenge.completed).length
@@ -199,10 +199,15 @@ export default function IntensiveMoodScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
+      <ScrollView showsVerticalScrollIndicator={false}>
       <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
 
       {/* Header Section */}
-      <View style={styles.headerContainer}>
+        <View style={styles.headerContainer}>
+          <Image
+            source={require("../../assets/images/icon.png")}
+            style={styles.imageLogo}
+            />
         <Text style={styles.appTitle}>Intensivo Dias Felizes</Text>
         <Text style={styles.subtitle}>7 dias para transformar seu humor</Text>
 
@@ -284,7 +289,7 @@ export default function IntensiveMoodScreen() {
             <TouchableOpacity
               style={[styles.tab, selectedTab === "challenges" && styles.activeTab]}
               onPress={() => setSelectedTab("challenges")}
-            >
+              >
               <Text style={[styles.tabText, selectedTab === "challenges" && styles.activeTabText]}>Desafios</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -309,6 +314,7 @@ export default function IntensiveMoodScreen() {
           <View style={styles.androidBottomSpacing} />
         </Animated.ScrollView>
       </Animated.View>
+          </ScrollView>
     </LinearGradient>
   )
 }
@@ -319,11 +325,16 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flex: 0.45,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     paddingTop: 60,
     paddingHorizontal: 24,
     zIndex: 2,
+  },
+  imageLogo: {
+    width: 100,
+    height: 100,
+    marginTop: 60,
   },
   appTitle: {
     fontSize: 28,
@@ -388,7 +399,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   contentContainer: {
-    // removido flex, agora é absoluto
     paddingHorizontal: 24,
     paddingTop: 24,
     shadowColor: "#000",
@@ -401,6 +411,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 32,
     zIndex: 3,
     paddingBottom: 30,
+    marginTop: 50,
   },
   tabContainer: {
     flexDirection: "row",

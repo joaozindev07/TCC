@@ -10,6 +10,8 @@ import {
   Dimensions,
   StatusBar,
   FlatList,
+  Image,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -180,9 +182,11 @@ export default function ProfessionalSearchScreen() {
       style={styles.container}
     >
       <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
+      <ScrollView showsVerticalScrollIndicator={false}>
 
       {/* Header Section */}
       <View style={styles.headerContainer}>
+        <Image source={require("../../assets/images/icon.png")} style={styles.imageLogo} />
         <Text style={styles.appTitle}>Encontrar Profissionais</Text>
         <Text style={styles.subtitle}>
           Conecte-se com especialistas qualificados
@@ -266,6 +270,7 @@ export default function ProfessionalSearchScreen() {
 
         <View style={styles.androidBottomSpacing} />
       </LinearGradient>
+      </ScrollView>
     </LinearGradient>
   );
 }
@@ -280,6 +285,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 60,
     paddingHorizontal: 32,
+  },
+  imageLogo: {
+    width: 100,
+    height: 100,
   },
   appTitle: {
     fontSize: 28,
