@@ -1,11 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Animated, View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar, Image, ScrollView } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { LinearGradient } from "expo-linear-gradient"
+import { useState, useRef } from "react";
+import {
+  Animated,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  StatusBar,
+  Image,
+  ScrollView,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
 const dailyChallenges = [
   {
@@ -79,7 +89,7 @@ const dailyChallenges = [
     xp: 200,
     difficulty: "Difícil",
   },
-]
+];
 
 const achievements = [
   {
@@ -89,34 +99,58 @@ const achievements = [
     icon: "trophy-outline",
     unlocked: true,
   },
-  { id: 2, title: "Sequência de 3", description: "Complete 3 dias seguidos", icon: "flame-outline", unlocked: true },
-  { id: 3, title: "Uma Semana", description: "Complete 7 dias de desafios", icon: "ribbon-outline", unlocked: false },
-]
+  {
+    id: 2,
+    title: "Sequência de 3",
+    description: "Complete 3 dias seguidos",
+    icon: "flame-outline",
+    unlocked: true,
+  },
+  {
+    id: 3,
+    title: "Uma Semana",
+    description: "Complete 7 dias de desafios",
+    icon: "ribbon-outline",
+    unlocked: false,
+  },
+];
 
 export default function IntensiveMoodScreen() {
-  const [currentStreak, setCurrentStreak] = useState(3)
-  const [totalXP, setTotalXP] = useState(225)
-  const [selectedTab, setSelectedTab] = useState("challenges")
-  const scrollY = useRef(new Animated.Value(0)).current
+  const [currentStreak, setCurrentStreak] = useState(3);
+  const [totalXP, setTotalXP] = useState(225);
+  const [selectedTab, setSelectedTab] = useState("challenges");
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   // Calcule a altura dinâmica baseada na sessão ativa
-  const itemCount = selectedTab === "challenges" ? dailyChallenges.length : achievements.length
+  const itemCount =
+    selectedTab === "challenges" ? dailyChallenges.length : achievements.length;
   // Exemplo: cada item ocupa 120px + padding, ajuste conforme seu design
-  const estimatedItemHeight = 120
-  const baseHeight = 220 // altura do header + tabs + padding
+  const estimatedItemHeight = 120;
+  const baseHeight = 220; // altura do header + tabs + padding
   const initialTop = height * 0.45; // ajuste esse valor para ficar logo abaixo da barra de progresso
 
-
-  const completedChallenges = dailyChallenges.filter((challenge) => challenge.completed).length
-  const progressPercentage = (completedChallenges / dailyChallenges.length) * 100
+  const completedChallenges = dailyChallenges.filter(
+    (challenge) => challenge.completed
+  ).length;
+  const progressPercentage =
+    (completedChallenges / dailyChallenges.length) * 100;
 
   const renderChallengeCard = ({ item }) => (
     <TouchableOpacity
-      style={[styles.challengeCard, item.completed && styles.completedCard, item.current && styles.currentCard]}
+      style={[
+        styles.challengeCard,
+        item.completed && styles.completedCard,
+        item.current && styles.currentCard,
+      ]}
       activeOpacity={0.8}
     >
       <View style={styles.challengeHeader}>
-        <View style={[styles.challengeIconContainer, item.completed && styles.completedIconContainer]}>
+        <View
+          style={[
+            styles.challengeIconContainer,
+            item.completed && styles.completedIconContainer,
+          ]}
+        >
           <Ionicons
             name={item.completed ? "checkmark" : item.icon}
             size={24}
@@ -126,8 +160,20 @@ export default function IntensiveMoodScreen() {
         <View style={styles.challengeInfo}>
           <View style={styles.challengeTitleRow}>
             <Text style={styles.challengeDay}>Dia {item.day}</Text>
-            <View style={[styles.difficultyBadge, getDifficultyStyle(item.difficulty)]}>
-              <Text style={[styles.difficultyText, getDifficultyTextStyle(item.difficulty)]}>{item.difficulty}</Text>
+            <View
+              style={[
+                styles.difficultyBadge,
+                getDifficultyStyle(item.difficulty),
+              ]}
+            >
+              <Text
+                style={[
+                  styles.difficultyText,
+                  getDifficultyTextStyle(item.difficulty),
+                ]}
+              >
+                {item.difficulty}
+              </Text>
             </View>
           </View>
           <Text style={styles.challengeTitle}>{item.title}</Text>
@@ -152,45 +198,67 @@ export default function IntensiveMoodScreen() {
         </TouchableOpacity>
       )}
     </TouchableOpacity>
-  )
+  );
 
   const renderAchievement = ({ item }) => (
-    <View style={[styles.achievementCard, !item.unlocked && styles.lockedAchievement]}>
-      <View style={[styles.achievementIcon, item.unlocked && styles.unlockedIcon]}>
-        <Ionicons name={item.icon} size={24} color={item.unlocked ? "#FFC107" : "#9CA3AF"} />
+    <View
+      style={[
+        styles.achievementCard,
+        !item.unlocked && styles.lockedAchievement,
+      ]}
+    >
+      <View
+        style={[styles.achievementIcon, item.unlocked && styles.unlockedIcon]}
+      >
+        <Ionicons
+          name={item.icon}
+          size={24}
+          color={item.unlocked ? "#FFC107" : "#9CA3AF"}
+        />
       </View>
       <View style={styles.achievementInfo}>
-        <Text style={[styles.achievementTitle, !item.unlocked && styles.lockedText]}>{item.title}</Text>
-        <Text style={[styles.achievementDescription, !item.unlocked && styles.lockedText]}>{item.description}</Text>
+        <Text
+          style={[styles.achievementTitle, !item.unlocked && styles.lockedText]}
+        >
+          {item.title}
+        </Text>
+        <Text
+          style={[
+            styles.achievementDescription,
+            !item.unlocked && styles.lockedText,
+          ]}
+        >
+          {item.description}
+        </Text>
       </View>
     </View>
-  )
+  );
 
   const getDifficultyStyle = (difficulty) => {
     switch (difficulty) {
       case "Fácil":
-        return styles.easyBadge
+        return styles.easyBadge;
       case "Médio":
-        return styles.mediumBadge
+        return styles.mediumBadge;
       case "Difícil":
-        return styles.hardBadge
+        return styles.hardBadge;
       default:
-        return styles.easyBadge
+        return styles.easyBadge;
     }
-  }
+  };
 
   const getDifficultyTextStyle = (difficulty) => {
     switch (difficulty) {
       case "Fácil":
-        return styles.easyText
+        return styles.easyText;
       case "Médio":
-        return styles.mediumText
+        return styles.mediumText;
       case "Difícil":
-        return styles.hardText
+        return styles.hardText;
       default:
-        return styles.easyText
+        return styles.easyText;
     }
-  }
+  };
 
   return (
     <LinearGradient
@@ -200,123 +268,174 @@ export default function IntensiveMoodScreen() {
       style={styles.container}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
-      <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
+        <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
 
-      {/* Header Section */}
+        {/* Header Section */}
         <View style={styles.headerContainer}>
           <Image
             source={require("../../assets/images/icon.png")}
             style={styles.imageLogo}
-            />
-        <Text style={styles.appTitle}>Intensivo Dias Felizes</Text>
-        <Text style={styles.subtitle}>7 dias para transformar seu humor</Text>
+          />
+          <Text style={styles.appTitle}>Intensivo Dias Felizes</Text>
+          <Text style={styles.subtitle}>7 dias para transformar seu humor</Text>
 
-        {/* Stats Row */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <Ionicons name="flame" size={20} color="#FFC107" />
+          {/* Stats Row */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <View style={styles.statIconContainer}>
+                <Ionicons name="flame" size={20} color="#FFC107" />
+              </View>
+              <Text style={styles.statNumber}>{currentStreak}</Text>
+              <Text style={styles.statLabel}>Sequência</Text>
             </View>
-            <Text style={styles.statNumber}>{currentStreak}</Text>
-            <Text style={styles.statLabel}>Sequência</Text>
+
+            <View style={styles.statItem}>
+              <View style={styles.statIconContainer}>
+                <Ionicons name="star" size={20} color="#FFC107" />
+              </View>
+              <Text style={styles.statNumber}>{totalXP}</Text>
+              <Text style={styles.statLabel}>XP Total</Text>
+            </View>
+
+            <View style={styles.statItem}>
+              <View style={styles.statIconContainer}>
+                <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+              </View>
+              <Text style={styles.statNumber}>{completedChallenges}/7</Text>
+              <Text style={styles.statLabel}>Completos</Text>
+            </View>
           </View>
 
-          <View style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <Ionicons name="star" size={20} color="#FFC107" />
+          {/* Progress Bar */}
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <LinearGradient
+                colors={["#10B981", "#34D399"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[
+                  styles.progressFill,
+                  { width: `${progressPercentage}%` },
+                ]}
+              />
             </View>
-            <Text style={styles.statNumber}>{totalXP}</Text>
-            <Text style={styles.statLabel}>XP Total</Text>
+            <Text style={styles.progressText}>
+              {Math.round(progressPercentage)}% completo
+            </Text>
           </View>
 
-          <View style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <Ionicons name="checkmark-circle" size={20} color="#10B981" />
-            </View>
-            <Text style={styles.statNumber}>{completedChallenges}/7</Text>
-            <Text style={styles.statLabel}>Completos</Text>
-          </View>
-        </View>
-
-        {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
+          {/* Calendário Intensivo */}
+          <TouchableOpacity
+            style={styles.calendarButtonWrapper}
+            activeOpacity={0.85}
+            onPress={() => {
+              // Futuro: router.push("/intensiveCalendar")
+            }}
+          >
             <LinearGradient
-              colors={["#10B981", "#34D399"]}
+              colors={["#ffd900d0", "#ffc107b7", "#ffb300a9"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={[styles.progressFill, { width: `${progressPercentage}%` }]}
-            />
-          </View>
-          <Text style={styles.progressText}>{Math.round(progressPercentage)}% completo</Text>
-        </View>
-      </View>
-
-      {/* Animated Content Section */}
-      <Animated.View
-        style={[
-          styles.contentContainer,
-          {
-            backgroundColor: "#FFFFFF",
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: scrollY.interpolate({
-              inputRange: [0, 180],
-              outputRange: [initialTop, height * 0.2], // começa abaixo da barra de progresso, sobe até 20% do topo
-              extrapolate: "clamp",
-            }),
-            height: scrollY.interpolate({
-              inputRange: [0, 180],
-              outputRange: [height - initialTop, height - height * 0.2], // altura acompanha o movimento
-              extrapolate: "clamp",
-            }),
-            borderTopLeftRadius: 32,
-            borderTopRightRadius: 32,
-          },
-        ]}
-      >
-        <Animated.ScrollView
-          showsVerticalScrollIndicator={false}
-          scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false }
-          )}
-        >
-          {/* Tab Navigation */}
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, selectedTab === "challenges" && styles.activeTab]}
-              onPress={() => setSelectedTab("challenges")}
-              >
-              <Text style={[styles.tabText, selectedTab === "challenges" && styles.activeTabText]}>Desafios</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, selectedTab === "achievements" && styles.activeTab]}
-              onPress={() => setSelectedTab("achievements")}
+              style={styles.calendarButton}
             >
-              <Text style={[styles.tabText, selectedTab === "achievements" && styles.activeTabText]}>Conquistas</Text>
-            </TouchableOpacity>
-          </View>
+              <Ionicons
+                name="calendar-outline"
+                size={22}
+                color="#fff"
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.calendarButtonText}>
+                Ver Calendário do Intensivo
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
 
-          {/* Content */}
-          {selectedTab === "challenges" ? (
-            <View>
-              {dailyChallenges.map((item) => renderChallengeCard({ item }))}
+        {/* Animated Content Section */}
+        <Animated.View
+          style={[
+            styles.contentContainer,
+            {
+              backgroundColor: "#FFFFFF",
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: scrollY.interpolate({
+                inputRange: [0, 180],
+                outputRange: [initialTop, height * 0.2], // começa abaixo da barra de progresso, sobe até 20% do topo
+                extrapolate: "clamp",
+              }),
+              height: scrollY.interpolate({
+                inputRange: [0, 180],
+                outputRange: [height - initialTop, height - height * 0.2], // altura acompanha o movimento
+                extrapolate: "clamp",
+              }),
+              borderTopLeftRadius: 32,
+              borderTopRightRadius: 32,
+            },
+          ]}
+        >
+          <Animated.ScrollView
+            showsVerticalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: false }
+            )}
+          >
+            {/* Tab Navigation */}
+            <View style={styles.tabContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.tab,
+                  selectedTab === "challenges" && styles.activeTab,
+                ]}
+                onPress={() => setSelectedTab("challenges")}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    selectedTab === "challenges" && styles.activeTabText,
+                  ]}
+                >
+                  Desafios
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.tab,
+                  selectedTab === "achievements" && styles.activeTab,
+                ]}
+                onPress={() => setSelectedTab("achievements")}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    selectedTab === "achievements" && styles.activeTabText,
+                  ]}
+                >
+                  Conquistas
+                </Text>
+              </TouchableOpacity>
             </View>
-          ) : (
-            <View>
-              {achievements.map((item) => renderAchievement({ item }))}
-            </View>
-          )}
 
-          <View style={styles.androidBottomSpacing} />
-        </Animated.ScrollView>
-      </Animated.View>
-          </ScrollView>
+            {/* Content */}
+            {selectedTab === "challenges" ? (
+              <View>
+                {dailyChallenges.map((item) => renderChallengeCard({ item }))}
+              </View>
+            ) : (
+              <View>
+                {achievements.map((item) => renderAchievement({ item }))}
+              </View>
+            )}
+
+            <View style={styles.androidBottomSpacing} />
+          </Animated.ScrollView>
+        </Animated.View>
+      </ScrollView>
     </LinearGradient>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -418,7 +537,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     borderRadius: 16,
     padding: 4,
-
   },
   tab: {
     flex: 1,
@@ -618,4 +736,30 @@ const styles = StyleSheet.create({
   androidBottomSpacing: {
     height: 24,
   },
-})
+  calendarButtonWrapper: {
+    width: "100%",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: -65,
+    marginTop: 16,
+    shadowColor: "#10B981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  calendarButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    elevation: 3,
+  },
+  calendarButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});

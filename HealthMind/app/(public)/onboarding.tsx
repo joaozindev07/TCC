@@ -1,34 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, StatusBar, Image, ScrollView } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { LinearGradient } from "expo-linear-gradient"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { useRouter } from "expo-router"
+import { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  StatusBar,
+  Image,
+  ScrollView,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export default function OnboardingScreen() {
-  const router = useRouter()
-  const [step, setStep] = useState(0)
-  const [answers, setAnswers] = useState<{ nome?: string; sentimento?: string; uso?: string }>({})
-  const [nomeInput, setNomeInput] = useState("")
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<{
+    nome?: string;
+    sentimento?: string;
+    uso?: string;
+  }>({});
+  const [nomeInput, setNomeInput] = useState("");
 
   const handleNext = async (value?: string) => {
-    let newAnswers = { ...answers }
-    if (step === 0) newAnswers.nome = nomeInput
-    if (step === 1 && value) newAnswers.sentimento = value
-    if (step === 2 && value) newAnswers.uso = value
+    let newAnswers = { ...answers };
+    if (step === 0) newAnswers.nome = nomeInput;
+    if (step === 1 && value) newAnswers.sentimento = value;
+    if (step === 2 && value) newAnswers.uso = value;
 
-    setAnswers(newAnswers)
+    setAnswers(newAnswers);
 
     if (step < onboardingQuestions.length - 1) {
-      setStep(step + 1)
+      setStep(step + 1);
     } else {
-      // Simula salvar em estado global (AsyncStorage)
-      await AsyncStorage.setItem("onboardingUser", JSON.stringify(newAnswers))
-      router.replace("/(tabs)/home")
+      await AsyncStorage.setItem("onboardingUser", JSON.stringify(newAnswers));
+      await AsyncStorage.setItem("onboardingComplete", "true"); // <-- ADICIONE ESTA LINHA
+      router.replace("/(tabs)/home");
     }
-  }
+  };
 
   const onboardingQuestions = [
     {
@@ -50,12 +63,15 @@ export default function OnboardingScreen() {
       title: "Como gostaria de usar o app?",
       subtitle: "Selecione o que mais faz sentido para sua experiência.",
       options: [
-        { label: "Agendar consultas com profissionais", icon: "calendar-outline" },
+        {
+          label: "Agendar consultas com profissionais",
+          icon: "calendar-outline",
+        },
         { label: "Receber recomendações personalizadas", icon: "star-outline" },
         { label: "Lembretes de autocuidado", icon: "alarm-outline" },
       ],
     },
-  ]
+  ];
 
   return (
     <LinearGradient
@@ -68,7 +84,10 @@ export default function OnboardingScreen() {
 
       <View style={styles.headerContainer}>
         <View style={styles.logoContainer}>
-          <Image source={require("../../assets/images/icon.png")} style={styles.imageLogo} />
+          <Image
+            source={require("../../assets/images/icon.png")}
+            style={styles.imageLogo}
+          />
         </View>
         <Text style={styles.appTitle}>HEALTHMIND</Text>
         <Text style={styles.welcomeText}>Bem-vindo!</Text>
@@ -87,7 +106,12 @@ export default function OnboardingScreen() {
               colors={["#A259F7", "#c85efd"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={[styles.progressFill, { width: `${((step + 1) / onboardingQuestions.length) * 100}%` }]}
+              style={[
+                styles.progressFill,
+                {
+                  width: `${((step + 1) / onboardingQuestions.length) * 100}%`,
+                },
+              ]}
             />
           </View>
           <Text style={styles.progressText}>
@@ -97,8 +121,12 @@ export default function OnboardingScreen() {
 
         {/* Question Section */}
         <View style={styles.questionContainer}>
-          <Text style={styles.questionTitle}>{onboardingQuestions[step].title}</Text>
-          <Text style={styles.questionSubtitle}>{onboardingQuestions[step].subtitle}</Text>
+          <Text style={styles.questionTitle}>
+            {onboardingQuestions[step].title}
+          </Text>
+          <Text style={styles.questionSubtitle}>
+            {onboardingQuestions[step].subtitle}
+          </Text>
         </View>
 
         {/* Step 1: Nome */}
@@ -126,8 +154,11 @@ export default function OnboardingScreen() {
 
         {/* Step 2 & 3: Opções */}
         {onboardingQuestions[step].options && (
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.optionsContainer}>
-            {onboardingQuestions[step].options.map((option, idx) => (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={styles.optionsContainer}
+          >
+            {onboardingQuestions[step].options.map((option) => (
               <TouchableOpacity
                 key={option.label}
                 style={styles.optionButtonWrapper}
@@ -142,30 +173,28 @@ export default function OnboardingScreen() {
                 >
                   <View style={styles.optionContent}>
                     <View style={styles.optionIconContainer}>
-                      <Ionicons name={option.icon as any} size={24} color="#FFFFFF" />
+                      <Ionicons
+                        name={option.icon as any}
+                        size={24}
+                        color="#FFFFFF"
+                      />
                     </View>
                     <Text style={styles.optionText}>{option.label}</Text>
-                    <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons
+                      name="chevron-forward"
+                      size={20}
+                      color="rgba(255,255,255,0.7)"
+                    />
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
             ))}
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={() => step === onboardingQuestions.length - 1 && handleNext()}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.nextButtonText}>
-                {step === onboardingQuestions.length - 1 ? "Finalizar" : "Próximo"}
-              </Text>
-            </TouchableOpacity>
           </ScrollView>
         )}
-
         <View style={styles.androidBottomSpacing} />
       </LinearGradient>
     </LinearGradient>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -292,4 +321,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   androidBottomSpacing: { height: 24 },
-})
+});

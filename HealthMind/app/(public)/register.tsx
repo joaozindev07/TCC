@@ -75,7 +75,7 @@ export default function RegisterScreen() {
       });
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        router.replace("/(public)/login");
+        router.replace("/onboarding");
       }
     } catch (err: any) {
       setErro(err.errors?.[0]?.message || "Erro ao verificar código.");

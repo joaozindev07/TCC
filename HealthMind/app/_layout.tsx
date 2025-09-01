@@ -16,11 +16,10 @@ const InitialLayout = () => {
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
-        // só checa se o usuário está logado
         if (isSignedIn) {
           const completed = await AsyncStorage.getItem("onboardingComplete");
           if (!completed) {
-            router.replace("/onboarding"); // agora só redireciona DEPOIS do login
+            router.replace("/onboarding");
             return;
           }
         }
@@ -42,10 +41,14 @@ const InitialLayout = () => {
     const inAuthGroup = segments[0] === "(auth)";
     const inPublicGroup = segments[0] === "(public)";
 
-    if (isSignedIn && !inAuthGroup) {
-      router.replace("/home"); // tabs/home
+    if (isSignedIn) {
+      AsyncStorage.getItem("onboardingComplete").then((completed) => {
+        if (completed && !inAuthGroup) {
+          router.replace("/home");
+        }
+      });
     } else if (!isSignedIn && !inPublicGroup) {
-      router.replace("/login"); // public/login
+      router.replace("/login");
     }
   }, [isSignedIn, onboardingChecked]);
 
