@@ -19,7 +19,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient"
 import { Ionicons } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
-import { useAuth } from "@clerk/clerk-expo"
+import { useAuth, useUser } from "@clerk/clerk-expo"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as ImagePicker from "expo-image-picker"
 
@@ -29,6 +29,7 @@ const STATUSBAR_HEIGHT = Platform.OS === "android" ? (StatusBar.currentHeight ??
 export default function ProfilePage() {
   const router = useRouter()
   const { signOut } = useAuth()
+  const { user } = useUser()
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [darkModeEnabled, setDarkModeEnabled] = useState(false)
   const [name, setName] = useState("Maria Silva")
@@ -39,11 +40,26 @@ export default function ProfilePage() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const savedName = await AsyncStorage.getItem("profile_name")
-        const savedEmail = await AsyncStorage.getItem("profile_email")
+        let savedName = await AsyncStorage.getItem("profile_name")
+        let savedEmail = await AsyncStorage.getItem("profile_email")
         const savedNotifications = await AsyncStorage.getItem("profile_notifications")
         const savedDarkMode = await AsyncStorage.getItem("profile_darkmode")
         const savedImage = await AsyncStorage.getItem("profile_image")
+
+        // Se não houver nome salvo, pega do onboarding
+        if (!savedName) {
+          const onboardingUser = await AsyncStorage.getItem("onboardingUser")
+          if (onboardingUser) {
+            const { nome } = JSON.parse(onboardingUser)
+            if (nome) savedName = nome
+          }
+        }
+
+        // Se não houver email salvo, pega do Clerk
+        if (!savedEmail && user?.primaryEmailAddress?.emailAddress) {
+          savedEmail = user.primaryEmailAddress.emailAddress
+        }
+
         if (savedName) setName(savedName)
         if (savedEmail) setEmail(savedEmail)
         if (savedNotifications) setNotificationsEnabled(savedNotifications === "true")
@@ -54,7 +70,7 @@ export default function ProfilePage() {
       }
     }
     loadProfile()
-  }, [])
+  }, [user])
 
   const handleSave = async () => {
     setLoading(true)

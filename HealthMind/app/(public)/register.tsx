@@ -18,6 +18,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -59,6 +60,7 @@ export default function RegisterScreen() {
       });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setEmailPending(true);
+      await AsyncStorage.setItem("profile_email", email);
     } catch (err: any) {
       setErro(err.errors?.[0]?.message || "Erro ao criar conta.");
     }
