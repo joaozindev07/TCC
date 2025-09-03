@@ -11,7 +11,6 @@ import {
   StatusBar,
   FlatList,
   Image,
-  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -182,77 +181,19 @@ export default function ProfessionalSearchScreen() {
       style={styles.container}
     >
       <StatusBar barStyle="light-content" backgroundColor="#A259F7" />
-      <ScrollView showsVerticalScrollIndicator={false}>
 
-      {/* Header Section */}
+      {/* header (roxo) permanece no topo DO LAYOUT) */}
       <View style={styles.headerContainer}>
-        <Image source={require("../../assets/images/icon.png")} style={styles.imageLogo} />
+        <Image
+          source={require("../../assets/images/icon.png")}
+          style={styles.imageLogo}
+        />
         <Text style={styles.appTitle}>Encontrar Profissionais</Text>
-        <Text style={styles.subtitle}>
-          Conecte-se com especialistas qualificados
-        </Text>
+        <Text style={styles.subtitle}>Conecte-se com especialistas qualificados</Text>
       </View>
 
-      {/* Search and Content */}
-      <LinearGradient
-        colors={["rgba(255, 255, 255, 0.98)", "rgba(255, 255, 255, 0.92)"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.contentContainer}
-      >
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <View style={styles.searchWrapper}>
-            <Ionicons
-              name="search-outline"
-              size={20}
-              color="#9CA3AF"
-              style={styles.searchIcon}
-            />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar por nome ou especialidade..."
-              placeholderTextColor="#9CA3AF"
-              value={searchText}
-              onChangeText={setSearchText}
-              autoCapitalize="none"
-              autoCorrect={false}
-              accessibilityLabel="Buscar profissional"
-              returnKeyType="search"
-            />
-            <TouchableOpacity
-              style={styles.filterToggle}
-              onPress={() => setShowFilters(!showFilters)}
-              accessibilityLabel="Mostrar filtros"
-            >
-              <Ionicons name="options-outline" size={20} color="#A259F7" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Filter Chips */}
-        {showFilters && (
-          <View style={styles.filtersContainer}>
-            <FlatList
-              data={professionalTypes}
-              renderItem={renderFilterChip}
-              keyExtractor={(item) => item.id.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filtersList}
-            />
-          </View>
-        )}
-
-        {/* Results Header */}
-        <View style={styles.resultsHeader}>
-          <Text style={styles.resultsTitle}>Profissionais Disponíveis</Text>
-          <Text style={styles.resultsCount}>
-            {filteredProfessionals.length} encontrados
-          </Text>
-        </View>
-
-        {/* Professionals List */}
+      {/* whiteContainer: container branco arredondado que segura toda a lista */}
+      <View style={styles.whiteContainer}>
         <FlatList
           data={filteredProfessionals}
           renderItem={renderProfessionalCard}
@@ -260,17 +201,58 @@ export default function ProfessionalSearchScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.professionalsList}
           ListEmptyComponent={
-            <Text
-              style={{ textAlign: "center", color: "#A259F7", marginTop: 32 }}
-            >
+            <Text style={{ textAlign: "center", color: "#A259F7", marginTop: 32 }}>
               Nenhum profissional encontrado.
             </Text>
           }
-        />
+          // cabeçalho da lista: busca / filtros / títulos (ficam DENTRO do branco)
+          ListHeaderComponent={
+            <>
+              {/* Search Bar */}
+              <View style={styles.searchContainer}>
+                <View style={styles.searchWrapper}>
+                  <Ionicons name="search-outline" size={20} color="#9CA3AF" style={styles.searchIcon} />
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Buscar..."
+                    placeholderTextColor="#9CA3AF"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    accessibilityLabel="Buscar profissional"
+                    returnKeyType="search"
+                  />
+                  <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
+                    <Ionicons name="options-outline" size={20} color="#A259F7" />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-        <View style={styles.androidBottomSpacing} />
-      </LinearGradient>
-      </ScrollView>
+              {/* Filter Chips */}
+              {showFilters && (
+                <View style={styles.filtersContainer}>
+                  <FlatList
+                    data={professionalTypes}
+                    renderItem={renderFilterChip}
+                    keyExtractor={(item) => item.id.toString()}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.filtersList}
+                  />
+                </View>
+              )}
+
+              {/* Results Header */}
+              <View style={styles.resultsHeader}>
+                <Text style={styles.resultsTitle}>Profissionais Disponíveis</Text>
+                <Text style={styles.resultsCount}>{filteredProfessionals.length} encontrados</Text>
+              </View>
+            </>
+          }
+          ListFooterComponent={<View style={styles.androidBottomSpacing} />}
+        />
+      </View>
     </LinearGradient>
   );
 }
@@ -279,11 +261,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
+  /* topo roxo */
   headerContainer: {
-    flex: 0.25,
+    // mantive paddings parecidos com o seu original
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 60,
+    paddingBottom: 20,
     paddingHorizontal: 32,
   },
   imageLogo: {
@@ -301,20 +286,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "rgba(255, 255, 255, 0.8)",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 8,
   },
-  contentContainer: {
-    flex: 0.75,
+
+  /* container branco que segura a lista inteira */
+  whiteContainer: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    // esse marginTop negativo faz a borda arredondada "sobrepor" o gradiente
+    marginTop: -10,
+    overflow: "hidden",
+    paddingTop: 16,
   },
+
+  /* Conteúdo interno dentro do branco */
+  contentContainer: {
+    /* não usado diretamente, mantive caso queira reaplicar */
+  },
+
+  /* FlatList content */
+  professionalsList: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 28,
+  },
+
+  /* Search & filters */
   searchContainer: {
     marginBottom: 20,
   },
@@ -346,7 +345,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   filtersContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   filtersList: {
     paddingHorizontal: 4,
@@ -382,6 +381,8 @@ const styles = StyleSheet.create({
   activeFilterText: {
     color: "#FFFFFF",
   },
+
+  /* results header */
   resultsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -397,9 +398,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6B7280",
   },
-  professionalsList: {
-    paddingBottom: 20,
-  },
+
+  /* cards */
   professionalCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
@@ -513,6 +513,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 8,
   },
+
   androidBottomSpacing: {
     height: 24,
   },

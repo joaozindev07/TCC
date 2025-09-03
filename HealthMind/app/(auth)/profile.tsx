@@ -292,7 +292,7 @@ export default function ProfilePage() {
         </LinearGradient>
       </ScrollView>
 
-      <View style={styles.androidSpacing} />
+     
     </LinearGradient>
   )
 }
@@ -600,8 +600,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginLeft: 8,
-  },
-  androidBottomSpacing: {
-    paddingBottom: 32,
   },
 })
