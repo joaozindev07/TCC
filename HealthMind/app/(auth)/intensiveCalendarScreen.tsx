@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center", // centraliza todo o conteúdo
   },
   backButton: {
     width: 40,
@@ -305,6 +306,7 @@ const styles = StyleSheet.create({
   headerContent: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center", // centraliza verticalmente também
   },
   imageLogo: {
     width: 60,
@@ -366,7 +368,7 @@ const styles = StyleSheet.create({
   calendarGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-around",
+    justifyContent: "center", // centraliza colunas
     marginBottom: 24,
   },
   emptyDay: {
@@ -546,6 +548,7 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     gap: 12,
+    alignItems: "center", // centraliza botões
   },
   primaryButton: {
     flexDirection: "row",
@@ -554,6 +557,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#A259F7",
     paddingVertical: 16,
     borderRadius: 16,
+    width: "100%",
+    maxWidth: 300, // largura máxima opcional
   },
   primaryButtonText: {
     color: "#FFFFFF",
@@ -569,6 +574,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#A259F7",
+    width: "100%",
+    maxWidth: 300,
   },
   secondaryButtonText: {
     color: "#A259F7",

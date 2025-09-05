@@ -291,11 +291,11 @@ export default function IntensiveMoodScreen() {
               <Text style={styles.tabText}>Conquistas</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity 
-          style={styles.calendarButton}
-          onPress={() => {
-            router.push('/intensiveCalendarScreen');
-          }}
+          <TouchableOpacity
+            style={styles.calendarButton}
+            onPress={() => {
+              router.push('/intensiveCalendarScreen');
+            }}
           >
             <Ionicons
               name="calendar-outline"
@@ -312,6 +312,9 @@ export default function IntensiveMoodScreen() {
             ? dailyChallenges.map((item) => renderChallengeCard({ item }))
             : achievements.map((item) => renderAchievement({ item }))}
 
+          {selectedTab === "achievements" && (
+            <View style={{ height: height * 0.4 }} /> 
+          )}
           <View style={{ height: 40 }} />
         </Animated.ScrollView>
       </Animated.View>
