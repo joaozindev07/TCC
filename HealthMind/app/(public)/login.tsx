@@ -1,6 +1,5 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Platform } from "react-native";
 import {
   View,
   ScrollView,
@@ -16,9 +15,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import { useSignIn } from "@clerk/clerk-expo";
+import { useOAuth, useSignIn, useUser } from "@clerk/clerk-expo";
+import * as WebBrowser from "expo-web-browser";
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import * as linking from 'expo-linking';
 
 const { width, height } = Dimensions.get("window");
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -28,6 +31,8 @@ export default function LoginScreen() {
   const [erro, setErro] = useState("");
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
+  const googleOAuth = useOAuth({ strategy: "oauth_google" }); // <-- Mova para o topo do componente
+  const { user } = useUser(); // Adicione este hook
 
   async function handleLogin() {
     if (!isLoaded) return;
@@ -39,13 +44,63 @@ export default function LoginScreen() {
         password: senha,
       });
       await setActive({ session: result.createdSessionId });
-      router.replace("/(auth)/home"); // ou a rota desejada após login
+      // Aqui você pode verificar o onboarding
+      const onboardingComplete = await AsyncStorage.getItem("onboardingComplete");
+      if (!onboardingComplete) {
+        router.replace("/onboarding");
+      } else {
+        router.replace("/(tabs)/home");
+      }
     } catch (e: any) {
       setErro(e.errors?.[0]?.message || "Email ou senha inválidos.");
     } finally {
       setIsLoading(false);
     }
   }
+
+  async function OnGoogleSignIn() {
+    try {
+      const redirectUrl = linking.createURL('/');
+      const oAuthFlow = await googleOAuth.startOAuthFlow({ redirectUrl });
+
+      if (oAuthFlow.authSessionResult?.type === "success") {
+        if (oAuthFlow.setActive) {
+          await oAuthFlow.setActive({ session: oAuthFlow.createdSessionId });
+
+          // Aguarde o Clerk atualizar o usuário
+          setTimeout(async () => {
+            // Pegue os dados do usuário logado
+            const currentUser = user;
+            if (currentUser) {
+              await AsyncStorage.setItem("profile_email", currentUser.emailAddresses[0]?.emailAddress || "");
+              await AsyncStorage.setItem("profile_name", currentUser.fullName || "");
+              await AsyncStorage.setItem("profile_photo", currentUser.imageUrl || "");
+            }
+            // Verifique onboarding após login social
+            const onboardingComplete = await AsyncStorage.getItem("onboardingComplete");
+            if (!onboardingComplete) {
+              router.replace("/onboarding");
+            } else {
+              router.replace("/(tabs)/home");
+            }
+          }, 500); // Pequeno delay para garantir que Clerk atualizou
+        }
+      } else {
+        console.log("Google Sign-In cancelled or failed");
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      WebBrowser.warmUpAsync();
+      return () => {
+        WebBrowser.coolDownAsync();
+      };
+    }
+  }, []);
 
   return (
     <LinearGradient
@@ -175,7 +230,7 @@ export default function LoginScreen() {
 
           {/* Social Buttons */}
           <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.socialButton} activeOpacity={0.7} onPress={OnGoogleSignIn}>
               <Text style={styles.socialButtonText}>G</Text>
               <Text style={styles.socialButtonLabel}>Google</Text>
             </TouchableOpacity>

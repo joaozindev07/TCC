@@ -75,10 +75,13 @@ export default function RegisterScreen() {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
       });
+
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
+        await AsyncStorage.removeItem("onboardingComplete"); // <-- Adicione esta linha
         router.replace("/onboarding");
       }
+
     } catch (err: any) {
       setErro(err.errors?.[0]?.message || "Erro ao verificar código.");
     }
@@ -327,7 +330,7 @@ export default function RegisterScreen() {
               </TouchableOpacity>
             </View>
           )}
-          </ScrollView>
+        </ScrollView>
       </LinearGradient>
     </LinearGradient>
   );

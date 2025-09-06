@@ -44,20 +44,21 @@ export default function ProfilePage() {
         let savedEmail = await AsyncStorage.getItem("profile_email")
         const savedNotifications = await AsyncStorage.getItem("profile_notifications")
         const savedDarkMode = await AsyncStorage.getItem("profile_darkmode")
-        const savedImage = await AsyncStorage.getItem("profile_image")
+        let savedImage = await AsyncStorage.getItem("profile_image")
 
-        // Se não houver nome salvo, pega do onboarding
-        if (!savedName) {
-          const onboardingUser = await AsyncStorage.getItem("onboardingUser")
-          if (onboardingUser) {
-            const { nome } = JSON.parse(onboardingUser)
-            if (nome) savedName = nome
-          }
+        // Se não houver nome salvo, pega do Clerk
+        if (!savedName && user?.fullName) {
+          savedName = user.fullName
         }
 
         // Se não houver email salvo, pega do Clerk
-        if (!savedEmail && user?.primaryEmailAddress?.emailAddress) {
+        if (user?.primaryEmailAddress?.emailAddress) {
           savedEmail = user.primaryEmailAddress.emailAddress
+        }
+
+        // Se não houver imagem salva, pega do Clerk (Google)
+        if (!savedImage && user?.imageUrl) {
+          savedImage = user.imageUrl
         }
 
         if (savedName) setName(savedName)
